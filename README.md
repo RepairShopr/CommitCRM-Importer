@@ -24,3 +24,9 @@ If you have a lot of data (thousands of tickets and customers) expect this to ta
 It should be able to resume properly - and it also writes out an error log if you want to see why records fail, as this is usually normal to get some percentage (1%-10%) for one reason or another.
 
 Any time you are asking for help with this tool, please share a dropbox/google drive link to your error log if possible.
+
+## Developer Notes
+
+Built with Visual Studio - community edition 2015 works
+
+Installer built with http://www.sminstall.com/
