@@ -1,0 +1,5 @@
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\bin\Release\RepairShoprCore.dll
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\bin\Release\RepairShoprCore.pdb
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\bin\Release\Newtonsoft.Json.dll
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\obj\Release\RepairShoprCore.dll
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\obj\Release\RepairShoprCore.pdb

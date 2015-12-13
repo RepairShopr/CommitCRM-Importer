@@ -1,0 +1,26 @@
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\bin\Debug\RepairShoprApps.exe.config
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\bin\Debug\RepairShoprApps.exe
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\bin\Debug\RepairShoprApps.pdb
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\bin\Debug\RepairShoprCore.dll
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\bin\Debug\Newtonsoft.Json.dll
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\bin\Debug\RepairShoprCore.pdb
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\obj\Debug\RepairShoprApps.csprojResolveAssemblyReference.cache
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\obj\Debug\RepairShoprApps.AboutBox1.resources
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\obj\Debug\RepairShoprApps.MainForm.resources
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\obj\Debug\RepairShoprApps.Properties.Resources.resources
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\obj\Debug\RepairShoprApps.csproj.GenerateResource.Cache
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\obj\Debug\RepairShoprApps.exe
+D:\ProjectExcel\RepairShoprApps\RepairShoprApps\obj\Debug\RepairShoprApps.pdb
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Debug\RepairShoprApps.exe.config
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Debug\RepairShoprApps.exe
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Debug\RepairShoprApps.pdb
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Debug\RepairShoprApps.csprojResolveAssemblyReference.cache
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Debug\RepairShoprApps.AboutBox1.resources
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Debug\RepairShoprApps.MainForm.resources
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Debug\RepairShoprApps.Properties.Resources.resources
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Debug\RepairShoprApps.csproj.GenerateResource.Cache
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Debug\RepairShoprApps.exe
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Debug\RepairShoprApps.pdb
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Debug\RepairShoprCore.dll
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Debug\Newtonsoft.Json.dll
+C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Debug\RepairShoprCore.pdb

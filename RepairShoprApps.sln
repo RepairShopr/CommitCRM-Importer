@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepairShoprApps", "RepairShoprApps\RepairShoprApps.csproj", "{088F3440-6813-4DD3-A36E-5D62BF8EACD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepairShoprCore", "RepairShoprCore\RepairShoprCore.csproj", "{10F39CA8-1D48-48B9-8F73-6526A8853AFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{088F3440-6813-4DD3-A36E-5D62BF8EACD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{088F3440-6813-4DD3-A36E-5D62BF8EACD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{088F3440-6813-4DD3-A36E-5D62BF8EACD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{088F3440-6813-4DD3-A36E-5D62BF8EACD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10F39CA8-1D48-48B9-8F73-6526A8853AFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10F39CA8-1D48-48B9-8F73-6526A8853AFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10F39CA8-1D48-48B9-8F73-6526A8853AFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10F39CA8-1D48-48B9-8F73-6526A8853AFD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
