@@ -209,11 +209,10 @@ namespace RepairShoprApps
                     conn.Open();
                     if (_exportCustomer)
                     {
-                        DateTime customerExport = DateTime.MinValue;
-                        if (Properties.Settings.Default.CustomerExport == null)
-                            customerExport = Directory.GetCreationTime(installedLocation);
-                        else
+                        DateTime customerExport = Directory.GetCreationTime(installedLocation);;
+                        if (Properties.Settings.Default.CustomerExport != null && Properties.Settings.Default.CustomerExport!=DateTime.MinValue)
                             customerExport = Properties.Settings.Default.CustomerExport;
+                            
                         while (customerExport < DateTime.Today)
                         {
                             customerIndex = 1;
@@ -308,9 +307,7 @@ namespace RepairShoprApps
                                             account.SetFieldValue("FLDCRDNOTES", string.Format("{0} # {1}", account.Notes, newCustomer.Id));
                                             account.Save();
                                             using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Account (AccountId,CustomerId) VALUES('{0}','{1}')", account.AccountREC_ID, newCustomer.Id), conn))
-                                                cmdINewItem.ExecuteNonQuery();
-                                            Properties.Settings.Default.CustomerExport = account.CreationDate;
-                                            Properties.Settings.Default.Save();
+                                                cmdINewItem.ExecuteNonQuery();                                           
                                             CommitCRM.ObjectQuery<CommitCRM.Contact> contactSearch = new CommitCRM.ObjectQuery<CommitCRM.Contact>();
                                             contactSearch.AddCriteria(CommitCRM.Contact.Fields.ParentAccountREC_ID, CommitCRM.OperatorEnum.opEqual, account.AccountREC_ID);
                                             List<CommitCRM.Contact> contacts = contactSearch.FetchObjects();
@@ -347,12 +344,12 @@ namespace RepairShoprApps
                                             bgw.ReportProgress(percentage, index);
 
                                         }
-                                        percentage = (100 * index) / totalNumer;
+                                        percentage = (100 * index) / totalcountData;
                                         bgw.ReportProgress(percentage, index);
                                     }
                                     else
                                     {
-                                        percentage = (100 * index) / totalNumer;
+                                        percentage = (100 * index) / totalcountData;
                                         bgw.ReportProgress(percentage, index);
                                     }
                                 }
@@ -362,7 +359,9 @@ namespace RepairShoprApps
                                 }
                                 index++;
                             }
-                            customerExport.AddMonths(1); //Add month by 1
+                            Properties.Settings.Default.CustomerExport = customerExport;
+                            Properties.Settings.Default.Save();
+                          customerExport= customerExport.AddMonths(1); //Add month by 1
                         }
                     }
                     if (_exportTicket)
