@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="CustomerExport" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">2005-08-28</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="TicketExport" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">2005-08-28</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Invoices" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">2005-08-28</Value>
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>
