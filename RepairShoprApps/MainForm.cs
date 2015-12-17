@@ -219,11 +219,13 @@ namespace RepairShoprApps
                             customerIndex = 1;
                             index = 1;
                             totalcountData = 0;
-                            CommitCRM.ObjectQuery<CommitCRM.Account> Accounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 200);
+                            CommitCRM.ObjectQuery<CommitCRM.Account> Accounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1000);
                             Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opGreaterThan,customerExport);
-                            List<CommitCRM.Account> CommitCRMAccountLists = Accounts.FetchObjects();
+                            Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opLessThan, customerExport.AddMonths(1));
                             _statusMessage = "Reading from CommitCRM.., it will take 2-3 mintues";
                             bgw.ReportProgress(percentage, index);
+                            List<CommitCRM.Account> CommitCRMAccountLists = Accounts.FetchObjects();                           
+                           
                             if (CommitCRMAccountLists != null)
                             {
                                 // totalNumer += CommitCRMAccountLists.Count;
