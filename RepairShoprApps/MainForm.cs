@@ -185,22 +185,8 @@ namespace RepairShoprApps
             int ticketIndex = 1;
             int customerCount = 0;
             int customerIndex = 1;
-            int totalcountData = 0;
-            List<CommitCRM.Ticket> CommitCRMTicketLists = null;
-            if (_exportTicket)
-            {
-                DateTime exportTicket = DateTime.MinValue;
-                if (Properties.Settings.Default.CustomerExport != null)
-                    exportTicket = Properties.Settings.Default.CustomerExport;
-                CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>();
-                Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, exportTicket);
-                CommitCRMTicketLists = Tickets.FetchObjects();
-                if (CommitCRMTicketLists != null)
-                {
-                    totalNumer = CommitCRMTicketLists.Count;
-                    ticketCount = CommitCRMTicketLists.Count;
-                }
-            }
+            int totalcountData = 0;          
+            
             lock (item_handle)
             {
 
@@ -209,7 +195,7 @@ namespace RepairShoprApps
                     conn.Open();
                     if (_exportCustomer)
                     {
-                        DateTime customerExport = Directory.GetCreationTime(installedLocation);;
+                        DateTime customerExport = Directory.GetCreationTime(installedLocation);
                         if (Properties.Settings.Default.CustomerExport != null && Properties.Settings.Default.CustomerExport!=DateTime.MinValue)
                             customerExport = Properties.Settings.Default.CustomerExport;
                             
@@ -366,101 +352,117 @@ namespace RepairShoprApps
                     }
                     if (_exportTicket)
                     {
-                        totalNumer = ticketCount + totalcountData;
-                        if (CommitCRMTicketLists == null)
-                            return;
-                        foreach (CommitCRM.Ticket ticket in CommitCRMTicketLists)
+                        DateTime exportTicket = Directory.GetCreationTime(installedLocation);
+                        if (Properties.Settings.Default.TicketExport != null && Properties.Settings.Default.TicketExport != DateTime.MinValue)
+                            exportTicket = Properties.Settings.Default.TicketExport;
+                        while (exportTicket < DateTime.Today)
                         {
-                            try
-                            {
-                                if (bgw.CancellationPending)
-                                {
-                                    RepairShoprUtils.LogWriteLineinHTML("Ticket Exporting Process is Stoped or Cancelled by User", MessageSource.Ticket, "", messageType.Warning);
-                                    bgw.ReportProgress(100, index);
-                                    break;
-                                }
+                            index = 1;
+                            totalNumer = 0;
+                            CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1000);
+                            Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, exportTicket);
+                            Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opLessThan, exportTicket.AddMonths(1));
+                            _statusMessage = "Reading from CommitCRM.., it will take 2-3 mintues";
+                            bgw.ReportProgress(percentage, index);
+                            List<CommitCRM.Ticket> CommitCRMTicketLists = Tickets.FetchObjects();
 
-                                string ticketId = string.Empty;
-                                using (SQLiteCommand cmdItemAlready = new SQLiteCommand(string.Format("SELECT RTicketId FROM Ticket WHERE ticketId='{0}'", ticket.TicketREC_ID), conn))
+                            if (CommitCRMTicketLists != null)
+                            {
+                                totalNumer = CommitCRMTicketLists.Count;
+                                ticketCount = CommitCRMTicketLists.Count;
+                            }
+                            totalNumer = ticketCount;
+
+                            _statusMessage = "Sending to RepairShopr..";
+                            bgw.ReportProgress(percentage, index);
+
+                            foreach (CommitCRM.Ticket ticket in CommitCRMTicketLists)
+                            {
+                                try
                                 {
-                                    using (SQLiteDataReader reader = cmdItemAlready.ExecuteReader())
+                                    if (bgw.CancellationPending)
                                     {
-                                        while (reader.Read())
+                                        RepairShoprUtils.LogWriteLineinHTML("Ticket Exporting Process is Stoped or Cancelled by User", MessageSource.Ticket, "", messageType.Warning);
+                                        bgw.ReportProgress(100, index);
+                                        break;
+                                    }
+
+                                    string ticketId = string.Empty;
+                                    using (SQLiteCommand cmdItemAlready = new SQLiteCommand(string.Format("SELECT RTicketId FROM Ticket WHERE ticketId='{0}'", ticket.TicketREC_ID), conn))
+                                    {
+                                        using (SQLiteDataReader reader = cmdItemAlready.ExecuteReader())
                                         {
-                                            ticketId = reader[0].ToString();
+                                            while (reader.Read())
+                                            {
+                                                ticketId = reader[0].ToString();
+                                            }
                                         }
                                     }
-                                }
 
-                                if (!string.IsNullOrEmpty(ticketId))
-                                {
-                                    RepairShoprUtils.LogWriteLineinHTML(string.Format("Ticket With Description: {0}  is already exported", ticket.Description), MessageSource.Customer, "", messageType.Warning);
-
-                                    percentage = (100 * index) / totalNumer;
-                                    _statusMessage = string.Format("Ticket : {0} is already Exported so, it is skipping", ticket.Description);
-                                    bgw.ReportProgress(percentage, index);
-                                    index++;
-                                    //customerIndex++;
-                                    continue;
-                                }
-                                string customerId = string.Empty;
-                                using (SQLiteCommand cmdItemAlready = new SQLiteCommand(string.Format("SELECT CustomerId FROM Account WHERE AccountId='{0}'", ticket.AccountREC_ID), conn))
-                                {
-                                    using (SQLiteDataReader reader = cmdItemAlready.ExecuteReader())
+                                    if (!string.IsNullOrEmpty(ticketId))
                                     {
-                                        while (reader.Read())
+                                        RepairShoprUtils.LogWriteLineinHTML(string.Format("Ticket With Description: {0}  is already exported", ticket.Description), MessageSource.Customer, "", messageType.Warning);
+
+                                        percentage = (100 * index) / totalNumer;
+                                        _statusMessage = string.Format("Ticket : {0} is already Exported so, it is skipping", ticket.Description);
+                                        bgw.ReportProgress(percentage, index);
+                                        index++;
+                                        //customerIndex++;
+                                        continue;
+                                    }
+                                    string customerId = string.Empty;
+                                    using (SQLiteCommand cmdItemAlready = new SQLiteCommand(string.Format("SELECT CustomerId FROM Account WHERE AccountId='{0}'", ticket.AccountREC_ID), conn))
+                                    {
+                                        using (SQLiteDataReader reader = cmdItemAlready.ExecuteReader())
                                         {
-                                            customerId = reader[0].ToString();
+                                            while (reader.Read())
+                                            {
+                                                customerId = reader[0].ToString();
+                                            }
                                         }
                                     }
+                                    if (string.IsNullOrEmpty(customerId))
+                                    {
+                                        RepairShoprUtils.LogWriteLineinHTML("Unable to locate Account with Ticket : " + ticket.Description, MessageSource.Ticket, "", messageType.Warning);
+                                        bgw.ReportProgress(100, index);
+                                        index++;
+                                        //ticketIndex++;
+                                        continue;
+                                    }                                    
+                                    NameValueCollection myNameValueCollection = new NameValueCollection();
+                                    myNameValueCollection.Add("subject", ticket.Description);
+                                    myNameValueCollection.Add("customer_id", customerId);
+                                    myNameValueCollection.Add("problem_type", ticket.TicketType);
+                                    myNameValueCollection.Add("status", "Resolved");
+                                    myNameValueCollection.Add("comment_body", GetCommentValue(ticket));
+                                    myNameValueCollection.Add("comment_subject", ticket.Status_Text);
+                                    myNameValueCollection.Add("comment_hidden", "1");
+                                    myNameValueCollection.Add("comment_do_not_email", "1");
+                                    var newTicket = RepairShoprUtils.ExportTicket(myNameValueCollection);
+                                    if (newTicket != null)
+                                    {
+                                        Properties.Settings.Default.TicketExport = ticket.UpdateDate;
+                                        Properties.Settings.Default.Save();
+                                        percentage = (100 * index) / totalNumer;
+                                        _statusMessage = string.Format("Exported ( {0}/{1} ) of Ticket", ticketIndex, ticketCount);
+                                        bgw.ReportProgress(percentage, index);
+                                        using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Ticket (TicketId,RTicketId) VALUES('{0}','{1}')", ticket.TicketREC_ID, newTicket.Id), conn))
+                                            cmdINewItem.ExecuteNonQuery();
+                                        RepairShoprUtils.LogWriteLineinHTML("Successfully Exported New Ticket in RepairShopr ", MessageSource.Ticket, "", messageType.Information);
+                                        ticketIndex++;
+                                    }
                                 }
-                                if (string.IsNullOrEmpty(customerId))
+                                catch (Exception ex)
                                 {
-                                    RepairShoprUtils.LogWriteLineinHTML("Unable to locate Account with Ticket : " + ticket.Description, MessageSource.Ticket, "", messageType.Warning);
-                                    bgw.ReportProgress(100, index);
-                                    index++;
-                                    //ticketIndex++;
-                                    continue;
+                                    RepairShoprUtils.LogWriteLineinHTML("Failed to Export New Ticket. Due to " + ex.Message, MessageSource.Ticket, ex.StackTrace, messageType.Error);
                                 }
+                                index++;
 
-                                //string[] emails = ticket.ExternalEmailRecipients.Split('=');
-                                //var customer=RepairShoprUtils.GetCustomerDetails(emails[1]);
-                                //if (customer == null)
-                                //    continue;
-                                NameValueCollection myNameValueCollection = new NameValueCollection();
-                                myNameValueCollection.Add("subject", ticket.Description);
-                                myNameValueCollection.Add("customer_id", customerId);
-                                myNameValueCollection.Add("problem_type", ticket.TicketType);
-                                myNameValueCollection.Add("status", "Resolved");
-                                myNameValueCollection.Add("comment_body", GetCommentValue(ticket));
-                                myNameValueCollection.Add("comment_subject", ticket.Status_Text);
-                                myNameValueCollection.Add("comment_hidden", "1");
-                                myNameValueCollection.Add("comment_do_not_email", "1");
-                                var newTicket = RepairShoprUtils.ExportTicket(myNameValueCollection);
-                                if (newTicket != null)
-                                {
-                                    Properties.Settings.Default.TicketExport = ticket.UpdateDate;
-                                    Properties.Settings.Default.Save();
-                                    percentage = (100 * index) / totalNumer;
-                                    _statusMessage = string.Format("Exported ( {0}/{1} ) of Ticket", ticketIndex, ticketCount);
-                                    bgw.ReportProgress(percentage, index);
-                                    using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Ticket (TicketId,RTicketId) VALUES('{0}','{1}')", ticket.TicketREC_ID, newTicket.Id), conn))
-                                        cmdINewItem.ExecuteNonQuery();
-                                    RepairShoprUtils.LogWriteLineinHTML("Successfully Exported New Ticket in RepairShopr ", MessageSource.Ticket, "", messageType.Information);
-                                    ticketIndex++;
-                                }
                             }
-                            catch (Exception ex)
-                            {
-                                RepairShoprUtils.LogWriteLineinHTML("Failed to Export New Ticket. Due to " + ex.Message, MessageSource.Ticket, ex.StackTrace, messageType.Error);
-                            }
-                            index++;
-
+                            Properties.Settings.Default.TicketExport = exportTicket;
+                            Properties.Settings.Default.Save();
+                            exportTicket = exportTicket.AddMonths(1);
                         }
-                    }
-                    if (_exportInvoice)
-                    {
-
                     }
                 }
             }
@@ -526,16 +528,7 @@ namespace RepairShoprApps
         }
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (bgw != null)
-            {
-                //bgw.CancelAsync();
-                bgw.Dispose();
-                bgw = null;
-                GC.Collect();
-
-            }
-            _exportCustomer = false;
-            _exportTicket = false;
+            
         }
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
