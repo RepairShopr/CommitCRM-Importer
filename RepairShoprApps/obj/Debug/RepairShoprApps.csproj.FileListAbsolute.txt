@@ -27,3 +27,16 @@ C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Debug\RepairShoprCor
 C:\Users\IEUser\CommitCRM-Exporter\RepairShoprApps\bin\Debug\RepairShoprApps.exe.config
 C:\Users\IEUser\CommitCRM-Exporter\RepairShoprApps\obj\Debug\RepairShoprApps.exe
 C:\Users\IEUser\CommitCRM-Exporter\RepairShoprApps\obj\Debug\RepairShoprApps.pdb
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\bin\Debug\RepairShoprApps.exe.config
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\obj\Debug\RepairShoprApps.exe
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\obj\Debug\RepairShoprApps.pdb
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\bin\Debug\RepairShoprApps.exe
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\bin\Debug\RepairShoprApps.pdb
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\bin\Debug\RepairShoprCore.dll
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\bin\Debug\Newtonsoft.Json.dll
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\bin\Debug\RepairShoprCore.pdb
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\obj\Debug\RepairShoprApps.csprojResolveAssemblyReference.cache
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\obj\Debug\RepairShoprApps.AboutBox1.resources
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\obj\Debug\RepairShoprApps.MainForm.resources
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\obj\Debug\RepairShoprApps.Properties.Resources.resources
+D:\ProjectExcel\RepairShoprGit\RepairShoprApps\obj\Debug\RepairShoprApps.csproj.GenerateResource.Cache

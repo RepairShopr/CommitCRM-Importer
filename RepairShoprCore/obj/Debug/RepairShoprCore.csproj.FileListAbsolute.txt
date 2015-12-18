@@ -7,3 +7,8 @@ C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\bin\Debug\RepairShoprCor
 C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\bin\Debug\RepairShoprCore.pdb
 C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\obj\Debug\RepairShoprCore.dll
 C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprCore\obj\Debug\RepairShoprCore.pdb
+D:\ProjectExcel\RepairShoprGit\RepairShoprCore\bin\Debug\RepairShoprCore.dll
+D:\ProjectExcel\RepairShoprGit\RepairShoprCore\bin\Debug\RepairShoprCore.pdb
+D:\ProjectExcel\RepairShoprGit\RepairShoprCore\obj\Debug\RepairShoprCore.dll
+D:\ProjectExcel\RepairShoprGit\RepairShoprCore\obj\Debug\RepairShoprCore.pdb
+D:\ProjectExcel\RepairShoprGit\RepairShoprCore\obj\Debug\RepairShoprCore.csprojResolveAssemblyReference.cache

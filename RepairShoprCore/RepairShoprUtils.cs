@@ -166,7 +166,7 @@ namespace RepairShoprCore
                 }
                 catch(Exception ex)
                 {
-                    RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Ticket in RepairShopr", MessageSource.Ticket, ex.Message, messageType.Error);
+                    RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Ticket in RepairShopr" +ex.Message, MessageSource.Ticket, ex.StackTrace, messageType.Error);
                 }
             }
             return null;

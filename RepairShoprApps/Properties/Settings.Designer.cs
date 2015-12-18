@@ -25,7 +25,6 @@ namespace RepairShoprApps.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2005-08-28")]
         public global::System.DateTime CustomerExport {
             get {
                 return ((global::System.DateTime)(this["CustomerExport"]));
@@ -37,7 +36,6 @@ namespace RepairShoprApps.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2005-08-28")]
         public global::System.DateTime TicketExport {
             get {
                 return ((global::System.DateTime)(this["TicketExport"]));
@@ -49,7 +47,6 @@ namespace RepairShoprApps.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2005-08-28")]
         public global::System.DateTime Invoices {
             get {
                 return ((global::System.DateTime)(this["Invoices"]));

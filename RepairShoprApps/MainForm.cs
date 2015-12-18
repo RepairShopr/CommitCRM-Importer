@@ -25,6 +25,7 @@ namespace RepairShoprApps
         public string _path = null;
         readonly object item_handle = new object();
         BackgroundWorker bgw = null;
+        string installedLocation = string.Empty;
         public MainForm()
         {
             InitializeComponent();
@@ -53,15 +54,15 @@ namespace RepairShoprApps
                     displayName = subkey.GetValue("DisplayName") as string;
                     if (p_name.Equals(displayName, StringComparison.OrdinalIgnoreCase) == true)
                     {
-                        var installedLocation = subkey.GetValue("InstallLocation") as string;//return true;
+                         installedLocation = subkey.GetValue("InstallLocation") as string;//return true;
                         RepairShoprUtils.LogWriteLineinHTML(string.Format("CommitCRM Install Directiory is '{0}'", installedLocation), MessageSource.Initialization, "", messageType.Information);
 
                         RepairShoprUtils.LogWriteLineinHTML("Setting CommitCRM Parameter such as DLL folder and DB Folder", MessageSource.Initialization, "", messageType.Information);
                         CommitCRM.Config config = new CommitCRM.Config();
                         config.AppName = "RepairShopr";
                         config.CommitDllFolder = Path.Combine(installedLocation, "ThirdParty", "UserDev");
-                        config.CommitDbFolder = Path.Combine(installedLocation, "db");
-                        CommitCRM.Application.Initialize(config);
+                        config.CommitDbFolder = Path.Combine(installedLocation, "db");                        
+                        CommitCRM.Application.Initialize(config);                       
                         RepairShoprUtils.LogWriteLineinHTML("Successfully configure CommitCRM ", MessageSource.Initialization, "", messageType.Information);
                         break;
                     }
@@ -184,12 +185,15 @@ namespace RepairShoprApps
             int ticketIndex = 1;
             int customerCount = 0;
             int customerIndex = 1;
+            int totalcountData = 0;
             List<CommitCRM.Ticket> CommitCRMTicketLists = null;
             if (_exportTicket)
             {
-                DateTime exportTicket = Properties.Settings.Default.TicketExport;
+                DateTime exportTicket = DateTime.MinValue;
+                if (Properties.Settings.Default.CustomerExport != null)
+                    exportTicket = Properties.Settings.Default.CustomerExport;
                 CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>();
-                Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, DateTime.MinValue);
+                Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, exportTicket);
                 CommitCRMTicketLists = Tickets.FetchObjects();
                 if (CommitCRMTicketLists != null)
                 {
@@ -205,145 +209,164 @@ namespace RepairShoprApps
                     conn.Open();
                     if (_exportCustomer)
                     {
-                        DateTime customerExport = Properties.Settings.Default.CustomerExport;
-                        CommitCRM.ObjectQuery<CommitCRM.Account> Accounts = new CommitCRM.ObjectQuery<CommitCRM.Account>();
-                        Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opGreaterThan, customerExport);
-                        List<CommitCRM.Account> CommitCRMAccountLists = Accounts.FetchObjects();
-                        if (CommitCRMAccountLists != null)
+                        DateTime customerExport = Directory.GetCreationTime(installedLocation);;
+                        if (Properties.Settings.Default.CustomerExport != null && Properties.Settings.Default.CustomerExport!=DateTime.MinValue)
+                            customerExport = Properties.Settings.Default.CustomerExport;
+                            
+                        while (customerExport < DateTime.Today)
                         {
-                            totalNumer += CommitCRMAccountLists.Count;
-                            customerCount = CommitCRMAccountLists.Count;
-                        }
-                        foreach (CommitCRM.Account account in CommitCRMAccountLists)
-                        {
-                            try
+                            customerIndex = 1;
+                            index = 1;
+                            totalcountData = 0;
+                            CommitCRM.ObjectQuery<CommitCRM.Account> Accounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1000);
+                            Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opGreaterThan,customerExport);
+                            Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opLessThan, customerExport.AddMonths(1));
+                            _statusMessage = "Reading from CommitCRM.., it will take 2-3 mintues";
+                            bgw.ReportProgress(percentage, index);
+                            List<CommitCRM.Account> CommitCRMAccountLists = Accounts.FetchObjects();                           
+                           
+                            if (CommitCRMAccountLists != null)
                             {
-                                if (bgw.CancellationPending)
+                                // totalNumer += CommitCRMAccountLists.Count;
+                                customerCount = CommitCRMAccountLists.Count;
+                                totalcountData = CommitCRMAccountLists.Count;
+
+                            }
+                            _statusMessage = "Sending to RepairShopr..";
+                            bgw.ReportProgress(percentage, index);
+                            foreach (CommitCRM.Account account in CommitCRMAccountLists)
+                            {
+                                try
                                 {
-                                    RepairShoprUtils.LogWriteLineinHTML("Contact Exporting Process is Stoped or Cancelled by User", MessageSource.Customer, "", messageType.Warning);
-                                    bgw.ReportProgress(100, index);
-                                    break;
-                                }
-                                //if (string.IsNullOrEmpty(account.LastName))
-                                //{
-                                //    RepairShoprUtils.LogWriteLineinHTML("Some Contacts missing Last Name and other Field.So, it is skipping ", MessageSource.Customer, "", messageType.Warning);
-                                //    _statusMessage = string.Format("Customer : {0} has empty other value so, it is skipping", account.Contact);
-                                //    percentage = (100 * index) / totalNumer;
-                                //    bgw.ReportProgress(percentage, index);
-                                //    index++;
-                                //    // customerIndex++;
-                                //    continue;
-                                //}
-                                if (account.AccountType_Text == "Account")
-                                {
-                                    string csutomerId = string.Empty;
-                                    using (SQLiteCommand cmdItemAlready = new SQLiteCommand(string.Format("SELECT CustomerId FROM Account WHERE AccountId='{0}'", account.AccountREC_ID), conn))
+
+                                    if (bgw.CancellationPending)
                                     {
-                                        using (SQLiteDataReader reader = cmdItemAlready.ExecuteReader())
+                                        RepairShoprUtils.LogWriteLineinHTML("Contact Exporting Process is Stoped or Cancelled by User", MessageSource.Customer, "", messageType.Warning);
+                                        bgw.ReportProgress(100, index);
+                                        break;
+                                    }
+                                    //if (string.IsNullOrEmpty(account.LastName))
+                                    //{
+                                    //    RepairShoprUtils.LogWriteLineinHTML("Some Contacts missing Last Name and other Field.So, it is skipping ", MessageSource.Customer, "", messageType.Warning);
+                                    //    _statusMessage = string.Format("Customer : {0} has empty other value so, it is skipping", account.Contact);
+                                    //    percentage = (100 * index) / totalNumer;
+                                    //    bgw.ReportProgress(percentage, index);
+                                    //    index++;
+                                    //    // customerIndex++;
+                                    //    continue;
+                                    //}
+                                    if (account.AccountType_Text == "Account")
+                                    {
+                                        string csutomerId = string.Empty;
+                                        using (SQLiteCommand cmdItemAlready = new SQLiteCommand(string.Format("SELECT CustomerId FROM Account WHERE AccountId='{0}'", account.AccountREC_ID), conn))
                                         {
-                                            while (reader.Read())
+                                            using (SQLiteDataReader reader = cmdItemAlready.ExecuteReader())
                                             {
-                                                csutomerId = reader[0].ToString();
+                                                while (reader.Read())
+                                                {
+                                                    csutomerId = reader[0].ToString();
+                                                }
                                             }
                                         }
-                                    }
 
-                                    if (!string.IsNullOrEmpty(csutomerId))
-                                    {
-                                        RepairShoprUtils.LogWriteLineinHTML(string.Format("Account With Last Name : {0}  is already exported", account.LastName), MessageSource.Customer, "", messageType.Warning);
+                                        if (!string.IsNullOrEmpty(csutomerId))
+                                        {
+                                            RepairShoprUtils.LogWriteLineinHTML(string.Format("Account With Last Name : {0}  is already exported", account.LastName), MessageSource.Customer, "", messageType.Warning);
 
-                                        percentage = (100 * index) / totalNumer;
-                                        _statusMessage = string.Format("Customer : {0} is already Exported so, it is skipping", account.LastName);
+                                            percentage = (100 * index) / totalcountData; //totalNumer;
+                                            _statusMessage = string.Format("Customer : {0} is already Exported so, it is skipping", account.LastName);
+                                            bgw.ReportProgress(percentage, index);
+                                            index++;
+                                            //customerIndex++;
+                                            continue;
+                                        }
+                                        percentage = (100 * index) / totalcountData;//totalNumer;
+                                        _statusMessage = string.Format("Exporting ( {0}/{1} ) of Account", customerIndex, customerCount);
                                         bgw.ReportProgress(percentage, index);
-                                        index++;
-                                        //customerIndex++;
-                                        continue;
+                                        RepairShoprUtils.LogWriteLineinHTML(string.Format("Creating Account with last Name : {0}", account.LastName), MessageSource.Customer, "", messageType.Information);
+                                        NameValueCollection myNameValueCollection = new NameValueCollection();
+                                        string fullname = account.GetFieldValue("FLDCRDCONTACT");
+                                        myNameValueCollection.Add("business_name", account.CompanyName);
+                                        if (!string.IsNullOrEmpty(fullname) && !string.IsNullOrEmpty(account.LastName))
+                                            myNameValueCollection.Add("firstname", fullname.Replace(account.LastName, string.Empty));
+                                        else
+                                            myNameValueCollection.Add("firstname", fullname);
+                                        myNameValueCollection.Add("lastname", account.LastName);
+                                        myNameValueCollection.Add("email", account.EmailAddress1);
+                                        myNameValueCollection.Add("phone", account.Phone1);
+                                        myNameValueCollection.Add("mobile", account.Phone2);
+                                        myNameValueCollection.Add("address", account.AddressLine1);
+                                        myNameValueCollection.Add("address_2", account.AddressLine2);
+                                        myNameValueCollection.Add("city", account.City);
+                                        myNameValueCollection.Add("state", account.State);
+                                        myNameValueCollection.Add("zip", account.Zip);
+                                        myNameValueCollection.Add("notes", account.Notes);
+                                        var newCustomer = RepairShoprUtils.ExportCustomer(myNameValueCollection);
+                                        if (newCustomer != null)
+                                        {
+                                            account.SetFieldValue("FLDCRDNOTES", string.Format("{0} # {1}", account.Notes, newCustomer.Id));
+                                            account.Save();
+                                            using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Account (AccountId,CustomerId) VALUES('{0}','{1}')", account.AccountREC_ID, newCustomer.Id), conn))
+                                                cmdINewItem.ExecuteNonQuery();                                           
+                                            CommitCRM.ObjectQuery<CommitCRM.Contact> contactSearch = new CommitCRM.ObjectQuery<CommitCRM.Contact>();
+                                            contactSearch.AddCriteria(CommitCRM.Contact.Fields.ParentAccountREC_ID, CommitCRM.OperatorEnum.opEqual, account.AccountREC_ID);
+                                            List<CommitCRM.Contact> contacts = contactSearch.FetchObjects();
+                                            RepairShoprUtils.LogWriteLineinHTML(string.Format("There are {0} Contact with Account : {1} ", contacts.Count, fullname), MessageSource.Contact, "", messageType.Information);
+                                            foreach (CommitCRM.Contact contact in contacts)
+                                            {
+                                                _statusMessage = string.Format("Exporting Contact :{0} of Account {1}", contact.LastName, fullname);
+                                                RepairShoprUtils.LogWriteLineinHTML(string.Format("Exported New Contact : {0} in RepairShopr ", contact.LastName), MessageSource.Contact, "", messageType.Information);
+                                                percentage = (100 * index) / totalNumer;
+                                                bgw.ReportProgress(percentage, index);
+                                                string contactname = contact.GetFieldValue("FLDCRDCONTACT");
+                                                NameValueCollection contactNameCollection = new NameValueCollection();
+                                                contactNameCollection.Add("email", contact.EmailAddress1);
+                                                contactNameCollection.Add("phone", contact.Phone1);
+                                                contactNameCollection.Add("mobile", contact.Phone2);
+                                                contactNameCollection.Add("address", contact.AddressLine1);
+                                                contactNameCollection.Add("address_2", contact.AddressLine2);
+                                                contactNameCollection.Add("city", contact.City);
+                                                contactNameCollection.Add("state", contact.State);
+                                                contactNameCollection.Add("zip", contact.Zip);
+                                                contactNameCollection.Add("customer_id", newCustomer.Id);
+                                                contactNameCollection.Add("name", contactname);
+                                                var result = RepairShoprUtils.ExportContact(contactNameCollection);
+                                                if (result != null)
+                                                {
+                                                    _statusMessage = string.Format("Exported Contact :{0} of Account {1}", contact.LastName, fullname);
+                                                }
+                                                percentage = (100 * index) / totalcountData;///totalNumer;
+                                                bgw.ReportProgress(percentage, index);
+                                            }
+                                            percentage = (100 * index) / totalcountData;//totalNumer;
+                                            _statusMessage = string.Format("Exported ( {0}/{1} ) of Account", customerIndex, customerCount);
+                                            customerIndex++;
+                                            bgw.ReportProgress(percentage, index);
+
+                                        }
+                                        percentage = (100 * index) / totalcountData;
+                                        bgw.ReportProgress(percentage, index);
                                     }
-                                    percentage = (100 * index) / totalNumer;
-                                    _statusMessage = string.Format("Exporting ( {0}/{1} ) of Account", customerIndex, customerCount);
-                                    bgw.ReportProgress(percentage, index);
-                                    RepairShoprUtils.LogWriteLineinHTML(string.Format("Creating Account with last Name : {0}", account.LastName), MessageSource.Customer, "", messageType.Information);
-                                    NameValueCollection myNameValueCollection = new NameValueCollection();
-                                    string fullname = account.GetFieldValue("FLDCRDCONTACT");
-                                    myNameValueCollection.Add("business_name", account.CompanyName);
-                                    if (!string.IsNullOrEmpty(fullname)&&!string.IsNullOrEmpty(account.LastName))
-                                        myNameValueCollection.Add("firstname", fullname.Replace(account.LastName, string.Empty));
                                     else
-                                        myNameValueCollection.Add("firstname", fullname);
-                                    myNameValueCollection.Add("lastname", account.LastName);
-                                    myNameValueCollection.Add("email", account.EmailAddress1);
-                                    myNameValueCollection.Add("phone", account.Phone1);
-                                    myNameValueCollection.Add("mobile", account.Phone2);
-                                    myNameValueCollection.Add("address", account.AddressLine1);
-                                    myNameValueCollection.Add("address_2", account.AddressLine2);
-                                    myNameValueCollection.Add("city", account.City);
-                                    myNameValueCollection.Add("state", account.State);
-                                    myNameValueCollection.Add("zip", account.Zip);
-                                    myNameValueCollection.Add("notes", account.Notes);
-                                    var newCustomer = RepairShoprUtils.ExportCustomer(myNameValueCollection);
-                                    if (newCustomer != null)
                                     {
-                                        account.SetFieldValue("FLDCRDNOTES", string.Format("{0} # {1}", account.Notes, newCustomer.Id));
-                                        account.Save();
-                                        using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Account (AccountId,CustomerId) VALUES('{0}','{1}')", account.AccountREC_ID, newCustomer.Id), conn))
-                                            cmdINewItem.ExecuteNonQuery();
-                                        Properties.Settings.Default.CustomerExport = account.CreationDate;
-                                        Properties.Settings.Default.Save();
-
-                                        CommitCRM.ObjectQuery<CommitCRM.Contact> contactSearch = new CommitCRM.ObjectQuery<CommitCRM.Contact>();
-                                        contactSearch.AddCriteria(CommitCRM.Contact.Fields.ParentAccountREC_ID, CommitCRM.OperatorEnum.opEqual,account.AccountREC_ID);
-                                        List<CommitCRM.Contact> contacts = contactSearch.FetchObjects();
-                                        RepairShoprUtils.LogWriteLineinHTML(string.Format("There are {0} Contact with Account : {1} ",contacts.Count,fullname), MessageSource.Contact, "", messageType.Information);
-                                        foreach (CommitCRM.Contact contact in contacts)
-                                        {
-                                            _statusMessage = string.Format("Exporting Contact :{0} of Account {1}", contact.LastName, fullname);
-                                            RepairShoprUtils.LogWriteLineinHTML(string.Format("Exported New Contact : {0} in RepairShopr ",contact.LastName), MessageSource.Contact, "", messageType.Information);
-                                            percentage = (100 * index) / totalNumer;
-                                            bgw.ReportProgress(percentage, index);
-                                            string contactname = contact.GetFieldValue("FLDCRDCONTACT");
-                                            NameValueCollection contactNameCollection = new NameValueCollection();
-                                            contactNameCollection.Add("email", contact.EmailAddress1);
-                                            contactNameCollection.Add("phone", contact.Phone1);
-                                            contactNameCollection.Add("mobile", contact.Phone2);
-                                            contactNameCollection.Add("address", contact.AddressLine1);
-                                            contactNameCollection.Add("address_2", contact.AddressLine2);
-                                            contactNameCollection.Add("city", contact.City);
-                                            contactNameCollection.Add("state", contact.State);
-                                            contactNameCollection.Add("zip", contact.Zip);
-                                            contactNameCollection.Add("customer_id", newCustomer.Id);
-                                            contactNameCollection.Add("name", contactname);
-                                            var result = RepairShoprUtils.ExportContact(contactNameCollection);
-                                            if (result != null)
-                                            {
-                                                _statusMessage = string.Format("Exported Contact :{0} of Account {1}", contact.LastName, fullname);
-                                            }
-                                            percentage = (100 * index) / totalNumer;
-                                            bgw.ReportProgress(percentage, index);
-                                        }
-                                        percentage = (100 * index) / totalNumer;
-                                        _statusMessage = string.Format("Exported ( {0}/{1} ) of Account", customerIndex, customerCount);
-                                        customerIndex++;
+                                        percentage = (100 * index) / totalcountData;
                                         bgw.ReportProgress(percentage, index);
-                                       
                                     }
-                                    percentage = (100 * index) / totalNumer;
-                                    bgw.ReportProgress(percentage, index);
                                 }
-                                else
+                                catch (Exception ex)
                                 {
-                                     percentage = (100 * index) / totalNumer;
-                                     bgw.ReportProgress(percentage, index);
+                                    RepairShoprUtils.LogWriteLineinHTML("Failed to Export New Contact. Due to " + ex.Message, MessageSource.Customer, ex.StackTrace, messageType.Error);
                                 }
+                                index++;
                             }
-                            catch (Exception ex)
-                            {
-                                RepairShoprUtils.LogWriteLineinHTML("Failed to Export New Contact. Due to " + ex.Message, MessageSource.Customer, ex.StackTrace, messageType.Error);
-                            }
-                            index++;
+                            Properties.Settings.Default.CustomerExport = customerExport;
+                            Properties.Settings.Default.Save();
+                          customerExport= customerExport.AddMonths(1); //Add month by 1
                         }
                     }
                     if (_exportTicket)
                     {
+                        totalNumer = ticketCount + totalcountData;
                         if (CommitCRMTicketLists == null)
                             return;
                         foreach (CommitCRM.Ticket ticket in CommitCRMTicketLists)
