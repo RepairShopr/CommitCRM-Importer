@@ -302,7 +302,7 @@ namespace RepairShoprApps
                                             {
                                                 _statusMessage = string.Format("Exporting Contact :{0} of Account {1}", contact.LastName, fullname);
                                                 RepairShoprUtils.LogWriteLineinHTML(string.Format("Exported New Contact : {0} in RepairShopr ", contact.LastName), MessageSource.Contact, "", messageType.Information);
-                                                percentage = (100 * index) / totalNumer;
+                                                percentage = (100 * index) / totalcountData;
                                                 bgw.ReportProgress(percentage, index);
                                                 string contactname = contact.GetFieldValue("FLDCRDCONTACT");
                                                 NameValueCollection contactNameCollection = new NameValueCollection();
@@ -428,14 +428,20 @@ namespace RepairShoprApps
                                         index++;
                                         //ticketIndex++;
                                         continue;
-                                    }                                    
+                                    }
+                                    RepairShoprUtils.LogWriteLineinHTML("Creating ticket with description  : " + ticket.Description, MessageSource.Ticket, "", messageType.Information);
+
+                                    RepairShoprUtils.LogWriteLineinHTML(string.Format("Ticket has following Information :  Subject : {0}, Customer Id: {1},Problem Type :{2},comment_subject:{3}", ticket.Description, customerId, ticket.TicketType, ticket.Status_Text), MessageSource.Ticket, "", messageType.Information);
+
                                     NameValueCollection myNameValueCollection = new NameValueCollection();
                                     myNameValueCollection.Add("subject", ticket.Description);
                                     myNameValueCollection.Add("customer_id", customerId);
-                                    myNameValueCollection.Add("problem_type", ticket.TicketType);
+                                    if (!string.IsNullOrEmpty(ticket.TicketType))
+                                        myNameValueCollection.Add("problem_type", ticket.TicketType);
                                     myNameValueCollection.Add("status", "Resolved");
                                     myNameValueCollection.Add("comment_body", GetCommentValue(ticket));
-                                    myNameValueCollection.Add("comment_subject", ticket.Status_Text);
+                                    if (!string.IsNullOrEmpty(ticket.Status_Text))
+                                        myNameValueCollection.Add("comment_subject", ticket.Status_Text);
                                     myNameValueCollection.Add("comment_hidden", "1");
                                     myNameValueCollection.Add("comment_do_not_email", "1");
                                     var newTicket = RepairShoprUtils.ExportTicket(myNameValueCollection);
