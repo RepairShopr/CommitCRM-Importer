@@ -359,6 +359,7 @@ namespace RepairShoprApps
                         {
                             index = 1;
                             totalNumer = 0;
+                            percentage = 1;
                             CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1000);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, exportTicket);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opLessThan, exportTicket.AddMonths(1));
@@ -370,8 +371,7 @@ namespace RepairShoprApps
                             {
                                 totalNumer = CommitCRMTicketLists.Count;
                                 ticketCount = CommitCRMTicketLists.Count;
-                            }
-                            totalNumer = ticketCount;
+                            }                           
 
                             _statusMessage = "Sending to RepairShopr..";
                             bgw.ReportProgress(percentage, index);
@@ -424,7 +424,8 @@ namespace RepairShoprApps
                                     if (string.IsNullOrEmpty(customerId))
                                     {
                                         RepairShoprUtils.LogWriteLineinHTML("Unable to locate Account with Ticket : " + ticket.Description, MessageSource.Ticket, "", messageType.Warning);
-                                        bgw.ReportProgress(100, index);
+                                        percentage = (100 * index) / totalNumer;
+                                        bgw.ReportProgress(percentage, index);
                                         index++;
                                         //ticketIndex++;
                                         continue;
@@ -596,6 +597,11 @@ namespace RepairShoprApps
                 {
                     rsult = cmdTicketDelete.ExecuteNonQuery();
                 }
+                DateTime defaultValue = Directory.GetCreationTime(installedLocation);
+                Properties.Settings.Default.TicketExport = defaultValue;
+                Properties.Settings.Default.CustomerExport = defaultValue;
+                Properties.Settings.Default.Save();
+
                 if (result != -1 && rsult != -1)
                 {
                     RepairShoprUtils.LogWriteLineinHTML("Reset Configuration including Database successfull.. ", MessageSource.Initialization, "", messageType.Information);
