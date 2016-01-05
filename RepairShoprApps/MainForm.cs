@@ -26,6 +26,8 @@ namespace RepairShoprApps
         readonly object item_handle = new object();
         BackgroundWorker bgw = null;
         string installedLocation = string.Empty;
+        bool isCompleteCustomer = false;
+        bool isCompleteTicket = false;
         public MainForm()
         {
             InitializeComponent();
@@ -177,7 +179,7 @@ namespace RepairShoprApps
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
+        {   
             int totalNumer = 0;
             int index = 1;
             int percentage = 1;
@@ -195,7 +197,6 @@ namespace RepairShoprApps
                     conn.Open();
                     if (_exportCustomer)
                     {
-
                         CommitCRM.ObjectQuery<CommitCRM.Account> DefaultAccounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1);
                         DefaultAccounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
                         List<CommitCRM.Account> DefaultAccountResult = DefaultAccounts.FetchObjects();
@@ -204,20 +205,26 @@ namespace RepairShoprApps
                             customerExport = DefaultAccountResult[0].CreationDate;
                         if (Properties.Settings.Default.CustomerExport != null && Properties.Settings.Default.CustomerExport > customerExport)
                             customerExport = Properties.Settings.Default.CustomerExport;
-
+                       
                         while (customerExport < DateTime.Today)
                         {
+                            if (bgw.CancellationPending)
+                            {
+                                RepairShoprUtils.LogWriteLineinHTML("Contact Exporting Process is Stoped or Cancelled by User", MessageSource.Customer, "", messageType.Warning);
+                                bgw.ReportProgress(100, index);
+                                return;
+                            }
                             customerIndex = 1;
                             index = 1;
                             totalcountData = 0;
+                            percentage = 1;
                             CommitCRM.ObjectQuery<CommitCRM.Account> Accounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1000);
                             Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opGreaterThan, customerExport);
                             Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opLessThan, customerExport.AddMonths(1));
                             Accounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
-                            _statusMessage = string.Format("Gathering Account from {0:y}.., it will take 2-3 mintues", customerExport);
+                            _statusMessage = string.Format("Loading  {0:y}.., it will take 2-3 mintues", customerExport);
                             bgw.ReportProgress(percentage, index);
-                            List<CommitCRM.Account> CommitCRMAccountLists = Accounts.FetchObjects();
-
+                            List<CommitCRM.Account> CommitCRMAccountLists = Accounts.FetchObjects();                           
                             if (CommitCRMAccountLists != null)
                             {
                                 // totalNumer += CommitCRMAccountLists.Count;
@@ -235,7 +242,7 @@ namespace RepairShoprApps
                                     if (bgw.CancellationPending)
                                     {
                                         RepairShoprUtils.LogWriteLineinHTML("Contact Exporting Process is Stoped or Cancelled by User", MessageSource.Customer, "", messageType.Warning);
-                                        bgw.ReportProgress(100, index);
+                                        bgw.ReportProgress(100, index);                                        
                                         break;
                                     }
                                     //if (string.IsNullOrEmpty(account.LastName))
@@ -356,6 +363,8 @@ namespace RepairShoprApps
                             Properties.Settings.Default.Save();
                             customerExport = customerExport.AddMonths(1); //Add month by 1
                         }
+                        isCompleteCustomer = true;
+                        bgw.ReportProgress(100, index);
                     }
                     if (_exportTicket)
                     {
@@ -366,19 +375,25 @@ namespace RepairShoprApps
                         if (DefaultTicketResult != null && DefaultTicketResult.Count > 0)
                             exportTicket = DefaultTicketResult[0].UpdateDate;
                         if (Properties.Settings.Default.TicketExport != null && Properties.Settings.Default.TicketExport > exportTicket)
-                            exportTicket = Properties.Settings.Default.TicketExport;
+                            exportTicket = Properties.Settings.Default.TicketExport;                       
                         while (exportTicket < DateTime.Today)
                         {
-                            index = 1;
+                            if (bgw.CancellationPending)
+                            {
+                                RepairShoprUtils.LogWriteLineinHTML("Ticket Exporting Process is Stoped or Cancelled by User", MessageSource.Ticket, "", messageType.Warning);
+                                bgw.ReportProgress(100, index);
+                                return;
+                            }
+                            index = 1;                           
                             totalNumer = 0;
                             percentage = 1;
                             CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1000);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, exportTicket);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opLessThan, exportTicket.AddMonths(1));
-                            _statusMessage = string.Format("Gathering ticket from {0:y}.., it will take 2-3 mintues", exportTicket);
+                            _statusMessage = string.Format("Loading {0:y}.., it will take 2-3 mintues", exportTicket);
                             bgw.ReportProgress(percentage, index);
-                            List<CommitCRM.Ticket> CommitCRMTicketLists = Tickets.FetchObjects();
-
+                            List<CommitCRM.Ticket> CommitCRMTicketLists = Tickets.FetchObjects();                            
+                                
                             if (CommitCRMTicketLists != null)
                             {
                                 totalNumer = CommitCRMTicketLists.Count;
@@ -395,7 +410,7 @@ namespace RepairShoprApps
                                     if (bgw.CancellationPending)
                                     {
                                         RepairShoprUtils.LogWriteLineinHTML("Ticket Exporting Process is Stoped or Cancelled by User", MessageSource.Ticket, "", messageType.Warning);
-                                        bgw.ReportProgress(100, index);
+                                        bgw.ReportProgress(100, index);                                       
                                         break;
                                     }
 
@@ -481,6 +496,8 @@ namespace RepairShoprApps
                             Properties.Settings.Default.Save();
                             exportTicket = exportTicket.AddMonths(1);
                         }
+                        isCompleteTicket = true;
+                        bgw.ReportProgress(100, index);
                     }
                 }
             }
@@ -538,10 +555,27 @@ namespace RepairShoprApps
             else
             {
                 progressBar1.Value = e.ProgressPercentage;
-                buttonStop.Enabled = false;
-                buttonExport.Enabled = true;
-                label3.Text = "Exporting Process is Completed";
-                RepairShoprUtils.LogWriteLineinHTML("Exporting Process is Completed ", MessageSource.Complete, "", messageType.Information);
+                if (_exportCustomer&& _exportTicket)
+                {
+                    if (isCompleteCustomer && isCompleteTicket)
+                    {
+                        buttonStop.Enabled = false;
+                        buttonExport.Enabled = true;
+                        label3.Text = "Exporting Process is Completed";
+                        RepairShoprUtils.LogWriteLineinHTML("Exporting Process is Completed ", MessageSource.Complete, "", messageType.Information);
+                    }
+                }
+                else if (_exportCustomer)
+                {
+                    if (isCompleteCustomer)
+                    {
+                        buttonStop.Enabled = false;
+                        buttonExport.Enabled = true;
+                        label3.Text = "Exporting Process is Completed";
+                        RepairShoprUtils.LogWriteLineinHTML("Exporting Process is Completed ", MessageSource.Complete, "", messageType.Information);
+                    }
+                }
+                
             }
         }
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
