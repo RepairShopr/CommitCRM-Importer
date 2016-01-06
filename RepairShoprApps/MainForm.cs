@@ -222,7 +222,7 @@ namespace RepairShoprApps
                             Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opGreaterThan, customerExport);
                             Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opLessThan, customerExport.AddMonths(1));
                             Accounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
-                            _statusMessage = string.Format("Loading  {0:y}.., it will take 2-3 mintues", customerExport);
+                            _statusMessage = string.Format("Loading Account from {0:y}.., it will take 2-3 mintues", customerExport);
                             bgw.ReportProgress(percentage, index);
                             List<CommitCRM.Account> CommitCRMAccountLists = Accounts.FetchObjects();                           
                             if (CommitCRMAccountLists != null)
@@ -387,10 +387,11 @@ namespace RepairShoprApps
                             index = 1;                           
                             totalNumer = 0;
                             percentage = 1;
+                            ticketIndex = 1;
                             CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1000);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, exportTicket);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opLessThan, exportTicket.AddMonths(1));
-                            _statusMessage = string.Format("Loading {0:y}.., it will take 2-3 mintues", exportTicket);
+                            _statusMessage = string.Format("Loading Ticket from  {0:y}.., it will take 2-3 mintues", exportTicket);
                             bgw.ReportProgress(percentage, index);
                             List<CommitCRM.Ticket> CommitCRMTicketLists = Tickets.FetchObjects();                            
                                 
@@ -462,7 +463,18 @@ namespace RepairShoprApps
                                     RepairShoprUtils.LogWriteLineinHTML(string.Format("Ticket has following Information :  Subject : {0}, Customer Id: {1},Problem Type :{2},comment_subject:{3}", ticket.Description, customerId, ticket.TicketType, ticket.Status_Text), MessageSource.Ticket, "", messageType.Information);
 
                                     NameValueCollection myNameValueCollection = new NameValueCollection();
-                                    myNameValueCollection.Add("subject", ticket.Description);
+                                    string subject = string.Empty;
+                                    if (!string.IsNullOrEmpty(ticket.Description))
+                                    {
+                                        if (ticket.Description.Length > 255)
+                                        {
+                                            subject = ticket.Description.Substring(0, 255);
+                                            RepairShoprUtils.LogWriteLineinHTML(string.Format("Ticket subject is truncate to length 255, Origional Ticket description is {0} and after Truncation is {1}",ticket.Description,subject), MessageSource.Ticket, "", messageType.Warning);
+                                        }
+                                        else
+                                            subject = ticket.Description;
+                                    }
+                                    myNameValueCollection.Add("subject", subject);
                                     myNameValueCollection.Add("customer_id", customerId);
                                     if (!string.IsNullOrEmpty(ticket.TicketType))
                                         myNameValueCollection.Add("problem_type", ticket.TicketType);

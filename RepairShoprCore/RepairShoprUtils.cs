@@ -115,9 +115,18 @@ namespace RepairShoprCore
                         return customerData.customer;
                     }                   
                 }
-                catch(Exception ex)
+                catch(WebException ex)
                 {
-                    RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Customer in RepairShopr", MessageSource.Customer,ex.Message, messageType.Error);
+                    using (Stream data = ex.Response.GetResponseStream())
+                    using (var reader = new StreamReader(data))
+                    {
+                        string bodyText = reader.ReadToEnd();
+                        RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Customer in RepairShopr. "+bodyText, MessageSource.Customer, ex.Message, messageType.Error);
+                    }                   
+                }
+                catch (Exception ex)
+                {
+                    RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Customer in RepairShopr. " + ex.Message, MessageSource.Customer, ex.Message, messageType.Error);
                 }
             }
             return null;
@@ -142,9 +151,18 @@ namespace RepairShoprCore
                     }                   
                    
                 }
+                catch (WebException ex)
+                {
+                    using (Stream data = ex.Response.GetResponseStream())
+                    using (var reader = new StreamReader(data))
+                    {
+                        string bodyText = reader.ReadToEnd();
+                        RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Contact in RepairShopr . "+bodyText, MessageSource.Contact, ex.Message, messageType.Error);
+                    }                   
+                }
                 catch (Exception ex)
                 {
-                    RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Contact in RepairShopr", MessageSource.Contact, ex.Message, messageType.Error);
+                    RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Contact in RepairShopr . " + ex.Message, MessageSource.Contact, ex.Message, messageType.Error);
                 }
             }
             return null;
@@ -164,9 +182,18 @@ namespace RepairShoprCore
                     if (ticketData != null && ticketData.ticket != null)
                         return ticketData.ticket;
                 }
+                catch(WebException ex)
+                {
+                    using (Stream data = ex.Response.GetResponseStream())
+                    using (var reader = new StreamReader(data))
+                    {
+                        string bodyText = reader.ReadToEnd();
+                        RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Ticket in RepairShopr . " + bodyText, MessageSource.Ticket, ex.StackTrace, messageType.Error);
+                    }                   
+                }
                 catch(Exception ex)
                 {
-                    RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Ticket in RepairShopr" +ex.Message, MessageSource.Ticket, ex.StackTrace, messageType.Error);
+                    RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Ticket in RepairShopr . " + ex.Message, MessageSource.Ticket, ex.StackTrace, messageType.Error);
                 }
             }
             return null;
