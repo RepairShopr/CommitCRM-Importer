@@ -21,6 +21,8 @@ Just check the box for customers (which includes contacts), and/or Tickets - and
 
 If you have a lot of data (thousands of tickets and customers) expect this to take quite a while.
 
+(eg, 2000 customers and 4000 tickets might take 12-24 hours..)
+
 It should be able to resume properly - and it also writes out an error log if you want to see why records fail, as this is usually normal to get some percentage (1%-10%) for one reason or another.
 
 Any time you are asking for help with this tool, please share a dropbox/google drive link to your error log if possible.
