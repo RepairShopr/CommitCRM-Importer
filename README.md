@@ -9,7 +9,7 @@ Feel free to fork and adapt to your REST API.
 
 Look for the link above to "Releases" and download the latest one.
 
-Look for a file inside that zipfile called "install.exe"
+Look for a file attached to the release called "install.exe"
 
 ## Operation
 
