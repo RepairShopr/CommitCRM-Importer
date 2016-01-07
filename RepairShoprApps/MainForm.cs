@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Web;
 using System.Windows.Forms;
 
 namespace RepairShoprApps
@@ -483,7 +484,9 @@ namespace RepairShoprApps
                                     if (!string.IsNullOrEmpty(ticket.Status_Text))
                                         myNameValueCollection.Add("comment_subject", ticket.Status_Text);
                                     myNameValueCollection.Add("comment_hidden", "1");
-                                    myNameValueCollection.Add("comment_do_not_email", "1");
+                                    myNameValueCollection.Add("comment_do_not_email", "1");                                   
+                                    string createDate=HttpUtility.UrlEncode(ticket.UpdateDate.ToString("yyyy-MM-dd H:mm:ss"));
+                                    myNameValueCollection.Add("created_at", createDate);
                                     var newTicket = RepairShoprUtils.ExportTicket(myNameValueCollection);
                                     if (newTicket != null)
                                     {
