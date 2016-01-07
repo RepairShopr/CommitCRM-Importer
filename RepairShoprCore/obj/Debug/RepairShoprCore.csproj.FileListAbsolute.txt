@@ -16,4 +16,3 @@ C:\Users\IEUser\CommitCRM-Exporter\RepairShoprCore\bin\Debug\RepairShoprCore.dll
 C:\Users\IEUser\CommitCRM-Exporter\RepairShoprCore\bin\Debug\RepairShoprCore.pdb
 C:\Users\IEUser\CommitCRM-Exporter\RepairShoprCore\obj\Debug\RepairShoprCore.dll
 C:\Users\IEUser\CommitCRM-Exporter\RepairShoprCore\obj\Debug\RepairShoprCore.pdb
-C:\Users\IEUser\CommitCRM-Exporter\RepairShoprCore\obj\Debug\RepairShoprCore.csprojResolveAssemblyReference.cache
