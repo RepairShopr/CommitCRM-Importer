@@ -215,6 +215,7 @@ namespace RepairShoprApps
                                 bgw.ReportProgress(100, index);
                                 return;
                             }
+                            RepairShoprUtils.LogWriteLineinHTML("Loading Account from  " + customerExport.ToString() + "to " + customerExport.AddMonths(1).ToString(), MessageSource.Ticket, "", messageType.Information);
                             customerIndex = 1;
                             index = 1;
                             totalcountData = 0;
@@ -304,9 +305,7 @@ namespace RepairShoprApps
                                     myNameValueCollection.Add("notes", account.Notes);
                                     var newCustomer = RepairShoprUtils.ExportCustomer(myNameValueCollection);
                                     if (newCustomer != null)
-                                    {
-                                        account.SetFieldValue("FLDCRDNOTES", string.Format("{0} # {1}", account.Notes, newCustomer.Id));
-                                        account.Save();
+                                    {                                        
                                         using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Account (AccountId,CustomerId) VALUES('{0}','{1}')", account.AccountREC_ID, newCustomer.Id), conn))
                                             cmdINewItem.ExecuteNonQuery();
                                         CommitCRM.ObjectQuery<CommitCRM.Contact> contactSearch = new CommitCRM.ObjectQuery<CommitCRM.Contact>();
@@ -360,9 +359,11 @@ namespace RepairShoprApps
                                 }
                                 index++;
                             }
+                            RepairShoprUtils.LogWriteLineinHTML("Sucessfull Loaded contact up to   " + customerExport.AddMinutes(1).ToString(), MessageSource.Ticket, "", messageType.Information);
                             Properties.Settings.Default.CustomerExport = customerExport;
                             Properties.Settings.Default.Save();
                             customerExport = customerExport.AddMonths(1); //Add month by 1
+                            
                         }
                         isCompleteCustomer = true;
                         bgw.ReportProgress(100, index);
@@ -385,6 +386,7 @@ namespace RepairShoprApps
                                 bgw.ReportProgress(100, index);
                                 return;
                             }
+                            RepairShoprUtils.LogWriteLineinHTML(" Loading Ticket from " +exportTicket.ToString()+ " To "+exportTicket.AddMonths(1), MessageSource.Ticket, "", messageType.Information);
                             index = 1;                           
                             totalNumer = 0;
                             percentage = 1;
@@ -454,6 +456,7 @@ namespace RepairShoprApps
                                     {
                                         RepairShoprUtils.LogWriteLineinHTML("Unable to locate Account with Ticket : " + ticket.Description, MessageSource.Ticket, "", messageType.Warning);
                                         percentage = (100 * index) / totalNumer;
+                                        _statusMessage = string.Format("Unable to locate customer Id for Ticket : {0}, it is skipping", ticket.Description);
                                         bgw.ReportProgress(percentage, index);
                                         index++;
                                         //ticketIndex++;
@@ -507,6 +510,7 @@ namespace RepairShoprApps
                                 index++;
 
                             }
+                            RepairShoprUtils.LogWriteLineinHTML("Sucessfull Loaded Ticket up to   " + exportTicket.AddMinutes(1).ToString(), MessageSource.Ticket, "", messageType.Information);
                             Properties.Settings.Default.TicketExport = exportTicket;
                             Properties.Settings.Default.Save();
                             exportTicket = exportTicket.AddMonths(1);
@@ -553,7 +557,7 @@ namespace RepairShoprApps
             }
             catch (Exception ex)
             {
-                RepairShoprUtils.LogWriteLineinHTML(string.Format("Failed to get Charge, HistoryNote of Ticket : {0} . Due to {1}", ticket.Description, ex.Message), MessageSource.Ticket, ex.StackTrace, messageType.Error);
+                RepairShoprUtils.LogWriteLineinHTML(string.Format("Failed to get Charge, HistoryNote of Ticket : {0} . Due to {1}", ticket.Description, ex.Message), MessageSource.Ticket, ex.StackTrace, messageType.Warning);
 
             }
             return sb.ToString();
@@ -583,6 +587,16 @@ namespace RepairShoprApps
                 else if (_exportCustomer)
                 {
                     if (isCompleteCustomer)
+                    {
+                        buttonStop.Enabled = false;
+                        buttonExport.Enabled = true;
+                        label3.Text = "Exporting Process is Completed";
+                        RepairShoprUtils.LogWriteLineinHTML("Exporting Process is Completed ", MessageSource.Complete, "", messageType.Information);
+                    }
+                }
+                else if (_exportTicket)
+                {
+                    if (isCompleteTicket)
                     {
                         buttonStop.Enabled = false;
                         buttonExport.Enabled = true;
