@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -109,11 +110,36 @@ namespace RepairShoprCore
                     var responseArray = myWebClient.UploadValues(urls, "POST", myNameValueCollection);                    
                     string jsonResult = Encoding.ASCII.GetString(responseArray);
                     RepairShoprUtils.LogWriteLineinHTML(string.Format("Server Response for Customer : {0} ", jsonResult), MessageSource.Customer, "", messageType.Information);
-                    var customerData = JsonConvert.DeserializeObject<CustomerRoot>(jsonResult);
-                    if (customerData != null && customerData.customer != null)
-                    {                       
-                        return customerData.customer;
-                    }                   
+                    if (jsonResult.Contains("success"))
+                    {
+                        try
+                        {
+                            var obj = JObject.Parse(jsonResult);
+                            var email = (string)obj["params"]["email"];
+                            if (string.IsNullOrEmpty(email))
+                                return null;
+                            string url = string.Format("http://{0}.{1}/api/v1/customers/autocomplete?api_key={2}&query={3}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim(), email);
+                            var result = myWebClient.DownloadString(url);
+                            var RootCustomer = JsonConvert.DeserializeObject<CustomerListRoot>(result);
+                            if(RootCustomer!=null)
+                            {
+                                if (RootCustomer.customers != null && RootCustomer.customers.Count > 0)
+                                    return RootCustomer.customers[0];
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        var customerData = JsonConvert.DeserializeObject<CustomerRoot>(jsonResult);
+                        if (customerData != null && customerData.customer != null)
+                        {
+                            return customerData.customer;
+                        }
+                    }                 
                 }
                 catch(WebException ex)
                 {

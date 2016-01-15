@@ -320,7 +320,8 @@ namespace RepairShoprApps
                                             bgw.ReportProgress(percentage, index);
                                             string contactname = contact.GetFieldValue("FLDCRDCONTACT");
                                             NameValueCollection contactNameCollection = new NameValueCollection();
-                                            contactNameCollection.Add("email", contact.EmailAddress1);
+                                            if (account.EmailAddress1.Contains("@"))
+                                                myNameValueCollection.Add("email", account.EmailAddress1);
                                             contactNameCollection.Add("phone", contact.Phone1);
                                             contactNameCollection.Add("mobile", contact.Phone2);
                                             contactNameCollection.Add("address", contact.AddressLine1);
@@ -344,14 +345,13 @@ namespace RepairShoprApps
                                         bgw.ReportProgress(percentage, index);
 
                                     }
+                                    else
+                                    {
+                                        RepairShoprUtils.LogWriteLineinHTML(string.Format("Unable to create Account with last Name : {0}", account.LastName), MessageSource.Customer, "", messageType.Warning);
+                                    }
                                     percentage = (100 * index) / totalcountData;
                                     bgw.ReportProgress(percentage, index);
-                                    //}
-                                    //else
-                                    //{
-                                    //    percentage = (100 * index) / totalcountData;
-                                    //    bgw.ReportProgress(percentage, index);
-                                    //}
+                                   
                                 }
                                 catch (Exception ex)
                                 {
@@ -391,7 +391,7 @@ namespace RepairShoprApps
                             totalNumer = 0;
                             percentage = 1;
                             ticketIndex = 1;
-                            CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1000);
+                            CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1500);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, exportTicket);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opLessThan, exportTicket.AddMonths(1));
                             _statusMessage = string.Format("Loading Ticket from  {0:y}.., it will take 2-3 mintues", exportTicket);
@@ -454,13 +454,17 @@ namespace RepairShoprApps
                                     }
                                     if (string.IsNullOrEmpty(customerId))
                                     {
-                                        RepairShoprUtils.LogWriteLineinHTML("Unable to locate Account with Ticket : " + ticket.Description, MessageSource.Ticket, "", messageType.Warning);
-                                        percentage = (100 * index) / totalNumer;
-                                        _statusMessage = string.Format("Unable to locate customer Id for Ticket : {0}, it is skipping", ticket.Description);
-                                        bgw.ReportProgress(percentage, index);
-                                        index++;
-                                        //ticketIndex++;
-                                        continue;
+                                        customerId = CreateContactForMissingTicket(ticket, conn);
+                                        if (string.IsNullOrEmpty(customerId))
+                                        {
+                                            RepairShoprUtils.LogWriteLineinHTML("Unable to locate Account with Ticket : " + ticket.Description, MessageSource.Ticket, "", messageType.Warning);
+                                            percentage = (100 * index) / totalNumer;
+                                            _statusMessage = string.Format("Unable to locate customer Id for Ticket : {0}, it is skipping", ticket.Description);
+                                            bgw.ReportProgress(percentage, index);
+                                            index++;
+                                            //ticketIndex++;
+                                            continue;
+                                        }
                                     }
                                     RepairShoprUtils.LogWriteLineinHTML("Creating ticket with description  : " + ticket.Description, MessageSource.Ticket, "", messageType.Information);
 
@@ -493,7 +497,6 @@ namespace RepairShoprApps
                                     var newTicket = RepairShoprUtils.ExportTicket(myNameValueCollection);
                                     if (newTicket != null)
                                     {
-
                                         percentage = (100 * index) / totalNumer;
                                         _statusMessage = string.Format("Exported ( {0}/{1} ) of Ticket", ticketIndex, ticketCount);
                                         bgw.ReportProgress(percentage, index);
@@ -501,6 +504,10 @@ namespace RepairShoprApps
                                             cmdINewItem.ExecuteNonQuery();
                                         RepairShoprUtils.LogWriteLineinHTML("Successfully Exported New Ticket in RepairShopr ", MessageSource.Ticket, "", messageType.Information);
                                         ticketIndex++;
+                                    }
+                                    else
+                                    {
+                                        RepairShoprUtils.LogWriteLineinHTML("Failed Exported New Ticket in RepairShopr "+ticket.Description, MessageSource.Ticket, "", messageType.Warning);
                                     }
                                 }
                                 catch (Exception ex)
@@ -521,6 +528,58 @@ namespace RepairShoprApps
                 }
             }
 
+        }
+
+
+        public string  CreateContactForMissingTicket(CommitCRM.Ticket ticket,SQLiteConnection conn)
+        {
+            string customerID = string.Empty;
+            CommitCRM.ObjectQuery<CommitCRM.Account> AccountSearch = new CommitCRM.ObjectQuery<CommitCRM.Account>();
+            AccountSearch.AddCriteria(CommitCRM.Account.Fields.AccountREC_ID, CommitCRM.OperatorEnum.opEqual, ticket.AccountREC_ID);
+            List<CommitCRM.Account> Accounts = AccountSearch.FetchObjects();
+            foreach (CommitCRM.Account account in Accounts)
+            {
+                try
+                {
+                    RepairShoprUtils.LogWriteLineinHTML(string.Format("Creating Account with last Name : {0}", account.LastName), MessageSource.Customer, "", messageType.Information);
+                    NameValueCollection myNameValueCollection = new NameValueCollection();
+                    string fullname = account.GetFieldValue("FLDCRDCONTACT");
+                    myNameValueCollection.Add("business_name", account.CompanyName);
+                    if (!string.IsNullOrEmpty(fullname) && !string.IsNullOrEmpty(account.LastName))
+                        myNameValueCollection.Add("firstname", fullname.Replace(account.LastName, string.Empty));
+                    else
+                        myNameValueCollection.Add("firstname", fullname);
+                    myNameValueCollection.Add("lastname", account.LastName);
+                    if (account.EmailAddress1.Contains("@"))
+                        myNameValueCollection.Add("email", account.EmailAddress1);
+                    myNameValueCollection.Add("phone", account.Phone1);
+                    myNameValueCollection.Add("mobile", account.Phone2);
+                    myNameValueCollection.Add("address", account.AddressLine1);
+                    myNameValueCollection.Add("address_2", account.AddressLine2);
+                    myNameValueCollection.Add("city", account.City);
+                    myNameValueCollection.Add("state", account.State);
+                    myNameValueCollection.Add("zip", account.Zip);
+                    myNameValueCollection.Add("notes", account.Notes);
+                    var newCustomer = RepairShoprUtils.ExportCustomer(myNameValueCollection);
+                    if (newCustomer != null)
+                    {
+                        using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Account (AccountId,CustomerId) VALUES('{0}','{1}')", account.AccountREC_ID, newCustomer.Id), conn))
+                            cmdINewItem.ExecuteNonQuery();
+                        customerID = newCustomer.Id;
+                        break;
+                    }
+                    else
+                    {
+                        RepairShoprUtils.LogWriteLineinHTML(string.Format("Faile to create account : {0} for Ticket : {1}", account.LastName,ticket.Description), MessageSource.Customer, "", messageType.Warning);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    RepairShoprUtils.LogWriteLineinHTML(string.Format("Faile to create account : {0} for Ticket : {1} dues to {3}", account.LastName, ticket.Description,ex.Message), MessageSource.Customer, ex.StackTrace, messageType.Error);
+                }              
+
+            }
+            return customerID;
         }
 
         private string GetCommentValue(CommitCRM.Ticket ticket)

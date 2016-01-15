@@ -32,4 +32,14 @@ namespace RepairShoprCore
             set;
         }
     }
+
+    public class CustomerListRoot
+    {
+        [JsonProperty("customers")]
+        public List<Customer> customers
+        {
+            get;
+            set;
+        }
+    }
 }
