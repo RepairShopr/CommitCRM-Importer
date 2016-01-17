@@ -47,12 +47,13 @@ namespace RepairShoprApps.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.DateTime Invoices {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TicketNumber {
             get {
-                return ((global::System.DateTime)(this["Invoices"]));
+                return ((string)(this["TicketNumber"]));
             }
             set {
-                this["Invoices"] = value;
+                this["TicketNumber"] = value;
             }
         }
     }

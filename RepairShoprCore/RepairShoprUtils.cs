@@ -14,15 +14,15 @@ namespace RepairShoprCore
     public class RepairShoprUtils
     {
         public static string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Repairshopr");
-        public static string path = folderPath + "\\" + string.Format("RepairshoprLog_{0}.Html", DateTime.Today.Date.ToString("dd/MM/yyyy").Replace("/", "_"));//Path.Combine(folderPath, "KarmaCRMLog.Html");
+        public static string path = folderPath + "\\" + string.Format("RepairshoprLog_{0}{1}.Html", DateTime.Today.Date.ToString("dd/MM/yyyy").Replace("/", "_"),string.Empty);//Path.Combine(folderPath, "KarmaCRMLog.Html");
         private static readonly object Obj = new object();
         public static LoginResponse LoginResponse = null;
         public static string globalURl = string.Empty;
+        static int sufix = 1;
         public static void LogWriteLineinHTML(string msg, MessageSource source, string exception, messageType msgType)
         {
             lock (Obj)
-            {
-
+            {               
                 if (!Directory.Exists(folderPath))
                     Directory.CreateDirectory(folderPath);
                 string header = "<html><title>CommitCRM integration with Repairshopr </title><head><head><body><div align='center'><h1> CommitCRM integration with Repairshopr </h1></div><table border=\"1\" style=\"width:100%\"><tr><th>Date Time</th><th>Source</th><th>Log Level </th><th>Message</th><th>Exception </th><tr>";
@@ -41,7 +41,13 @@ namespace RepairShoprCore
                 {
                     message = string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3} </td><td>{4}</td></tr>", DateTime.Now, source, msgType, msg, exception);
                 }
-
+                FileInfo fl = new FileInfo(path);
+                long size = fl.Length;
+                if (ConvertBytesToMegabytes (size)> 3)
+                {
+                    path = folderPath + "\\" + string.Format("RepairshoprLog_{0}_{1}.Html", DateTime.Today.Date.ToString("dd/MM/yyyy").Replace("/", "_"), sufix);//Path.Combine(folderPath, "KarmaCRMLog.Html");
+                    sufix++;
+                }
                 if (!File.Exists(path))
                 {
                     using (StreamWriter sw = File.CreateText(path))
@@ -59,6 +65,11 @@ namespace RepairShoprCore
                     }
                 }
             }
+        }
+
+        static double ConvertBytesToMegabytes(long bytes)
+        {
+            return (bytes / 1024f) / 1024f;
         }
         public static LoginResponse GetLoginResquest(string username,string password)
         {
