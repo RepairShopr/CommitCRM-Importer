@@ -314,8 +314,7 @@ namespace RepairShoprApps
                                         List<CommitCRM.Contact> contacts = contactSearch.FetchObjects();
                                         RepairShoprUtils.LogWriteLineinHTML(string.Format("There are {0} Contact with Account : {1} ", contacts.Count, fullname), MessageSource.Contact, "", messageType.Information);
                                         foreach (CommitCRM.Contact contact in contacts)
-                                        {
-                                            continue;
+                                        {                                            
                                             _statusMessage = string.Format("Exporting Contact :{0} of Account {1}", contact.LastName, fullname);
                                             RepairShoprUtils.LogWriteLineinHTML(string.Format("Exported New Contact : {0} in RepairShopr ", contact.LastName), MessageSource.Contact, "", messageType.Information);
                                             percentage = (100 * index) / totalcountData;
