@@ -41,12 +41,15 @@ namespace RepairShoprCore
                 {
                     message = string.Format("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3} </td><td>{4}</td></tr>", DateTime.Now, source, msgType, msg, exception);
                 }
-                FileInfo fl = new FileInfo(path);
-                long size = fl.Length;
-                if (ConvertBytesToMegabytes (size)> 3)
+                if (File.Exists(path))
                 {
-                    path = folderPath + "\\" + string.Format("RepairshoprLog_{0}_{1}.Html", DateTime.Today.Date.ToString("dd/MM/yyyy").Replace("/", "_"), sufix);//Path.Combine(folderPath, "KarmaCRMLog.Html");
-                    sufix++;
+                    FileInfo fl = new FileInfo(path);
+                    long size = fl.Length;
+                    if (ConvertBytesToMegabytes(size) > 3)
+                    {
+                        path = folderPath + "\\" + string.Format("RepairshoprLog_{0}_{1}.Html", DateTime.Today.Date.ToString("dd/MM/yyyy").Replace("/", "_"), sufix);//Path.Combine(folderPath, "KarmaCRMLog.Html");
+                        sufix++;
+                    }
                 }
                 if (!File.Exists(path))
                 {

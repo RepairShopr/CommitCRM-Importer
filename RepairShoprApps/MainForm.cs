@@ -310,7 +310,7 @@ namespace RepairShoprApps
                                         using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Account (AccountId,CustomerId) VALUES('{0}','{1}')", account.AccountREC_ID, newCustomer.Id), conn))
                                             cmdINewItem.ExecuteNonQuery();
                                         CommitCRM.ObjectQuery<CommitCRM.Contact> contactSearch = new CommitCRM.ObjectQuery<CommitCRM.Contact>();
-                                        contactSearch.AddCriteria(CommitCRM.Contact.Fields.ParentAccountREC_ID, CommitCRM.OperatorEnum.opEqual, account.AccountREC_ID);
+                                        contactSearch.AddCriteria(CommitCRM.Contact.Fields.ContactREC_ID, CommitCRM.OperatorEnum.opEqual, account.AccountREC_ID);
                                         List<CommitCRM.Contact> contacts = contactSearch.FetchObjects();
                                         RepairShoprUtils.LogWriteLineinHTML(string.Format("There are {0} Contact with Account : {1} ", contacts.Count, fullname), MessageSource.Contact, "", messageType.Information);
                                         foreach (CommitCRM.Contact contact in contacts)
