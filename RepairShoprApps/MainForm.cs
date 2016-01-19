@@ -310,7 +310,7 @@ namespace RepairShoprApps
                                         using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Account (AccountId,CustomerId) VALUES('{0}','{1}')", account.AccountREC_ID, newCustomer.Id), conn))
                                             cmdINewItem.ExecuteNonQuery();
                                         CommitCRM.ObjectQuery<CommitCRM.Contact> contactSearch = new CommitCRM.ObjectQuery<CommitCRM.Contact>();
-                                        contactSearch.AddCriteria(CommitCRM.Contact.Fields.ContactREC_ID, CommitCRM.OperatorEnum.opEqual, account.AccountREC_ID);
+                                        contactSearch.AddCriteria(CommitCRM.Contact.Fields.ParentAccountREC_ID, CommitCRM.OperatorEnum.opEqual, account.AccountREC_ID);
                                         List<CommitCRM.Contact> contacts = contactSearch.FetchObjects();
                                         RepairShoprUtils.LogWriteLineinHTML(string.Format("There are {0} Contact with Account : {1} ", contacts.Count, fullname), MessageSource.Contact, "", messageType.Information);
                                         foreach (CommitCRM.Contact contact in contacts)
@@ -322,7 +322,7 @@ namespace RepairShoprApps
                                             string contactname = contact.GetFieldValue("FLDCRDCONTACT");
                                             NameValueCollection contactNameCollection = new NameValueCollection();
                                             if (account.EmailAddress1.Contains("@"))
-                                                myNameValueCollection.Add("email", account.EmailAddress1);
+                                                myNameValueCollection.Add("email", contact.EmailAddress1);
                                             contactNameCollection.Add("phone", contact.Phone1);
                                             contactNameCollection.Add("mobile", contact.Phone2);
                                             contactNameCollection.Add("address", contact.AddressLine1);
