@@ -8,7 +8,7 @@
     <Setting Name="TicketExport" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Invoices" Type="System.DateTime" Scope="User">
+    <Setting Name="TicketNumber" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
