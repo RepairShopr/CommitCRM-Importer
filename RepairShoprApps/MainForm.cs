@@ -30,6 +30,7 @@ namespace RepairShoprApps
         string installedLocation = string.Empty;
         bool isCompleteCustomer = false;
         bool isCompleteTicket = false;
+        int globalTicketNumber = 17000;                      
         public MainForm()
         {
             InitializeComponent();
@@ -38,6 +39,7 @@ namespace RepairShoprApps
             buttonExport.Enabled = false;
             progressBar1.Visible = false;
             label3.Text = "";
+
             RepairShoprUtils.LogWriteLineinHTML("Initializing System with Default value", MessageSource.Initialization, "", messageType.Information);
             CommitCRMHandle();
             DBhandler();
@@ -166,7 +168,15 @@ namespace RepairShoprApps
             }
             _exportTicket = checkBoxExportTicket.Checked;
             _exportCustomer = checkBoxExportCustomer.Checked;
-            _exportInvoice = checkBoxExportInvoice.Checked;
+            if (_exportTicket)
+            {
+                if (string.IsNullOrEmpty(textBoxTicketNo.Text))
+                {
+                    MessageBox.Show("Please enter maximum number of Tickets", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+            }
+            int.TryParse(textBoxTicketNo.Text.Trim(),out globalTicketNumber);
             progressBar1.Value = 0;
             progressBar1.Visible = true;
             progressBar1.Enabled = true;
@@ -177,6 +187,7 @@ namespace RepairShoprApps
             bgw.WorkerSupportsCancellation = true;
             bgw.RunWorkerAsync();
             buttonStop.Enabled = true;
+            
 
         }
 
@@ -371,10 +382,8 @@ namespace RepairShoprApps
                         bgw.ReportProgress(100, index);
                     }
                     if (_exportTicket)
-                    {
+                    {                     
                        
-                        int globalTicketNumber = 17000;
-                        int.TryParse(ConfigurationManager.AppSettings.Get("MaxNumberOfTickets"), out globalTicketNumber);
                         string startTicket = string.Empty;
                         int ticketNumber = 0;
                         CommitCRM.ObjectQuery<CommitCRM.Ticket> DefaultTickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1);

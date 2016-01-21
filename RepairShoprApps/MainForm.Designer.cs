@@ -39,7 +39,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.checkBoxExportCustomer = new System.Windows.Forms.CheckBox();
             this.checkBoxExportTicket = new System.Windows.Forms.CheckBox();
-            this.checkBoxExportInvoice = new System.Windows.Forms.CheckBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.buttonExport = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
@@ -48,6 +47,7 @@
             this.viewLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hELPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.supportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
@@ -56,7 +56,8 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.buttonStop = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.supportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBoxTicketNo = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -147,7 +148,7 @@
             this.checkBoxExportCustomer.Checked = true;
             this.checkBoxExportCustomer.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxExportCustomer.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxExportCustomer.Location = new System.Drawing.Point(36, 301);
+            this.checkBoxExportCustomer.Location = new System.Drawing.Point(36, 322);
             this.checkBoxExportCustomer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBoxExportCustomer.Name = "checkBoxExportCustomer";
             this.checkBoxExportCustomer.Size = new System.Drawing.Size(224, 21);
@@ -162,26 +163,13 @@
             this.checkBoxExportTicket.Checked = true;
             this.checkBoxExportTicket.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxExportTicket.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxExportTicket.Location = new System.Drawing.Point(36, 325);
+            this.checkBoxExportTicket.Location = new System.Drawing.Point(36, 346);
             this.checkBoxExportTicket.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBoxExportTicket.Name = "checkBoxExportTicket";
             this.checkBoxExportTicket.Size = new System.Drawing.Size(201, 21);
             this.checkBoxExportTicket.TabIndex = 3;
             this.checkBoxExportTicket.Text = "Export Tickets to RepairShopr";
             this.checkBoxExportTicket.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxExportInvoice
-            // 
-            this.checkBoxExportInvoice.AutoSize = true;
-            this.checkBoxExportInvoice.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxExportInvoice.Location = new System.Drawing.Point(36, 348);
-            this.checkBoxExportInvoice.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.checkBoxExportInvoice.Name = "checkBoxExportInvoice";
-            this.checkBoxExportInvoice.Size = new System.Drawing.Size(208, 21);
-            this.checkBoxExportInvoice.TabIndex = 4;
-            this.checkBoxExportInvoice.Text = "Export Invoices to RepairShopr";
-            this.checkBoxExportInvoice.UseVisualStyleBackColor = true;
-            this.checkBoxExportInvoice.Visible = false;
             // 
             // pictureBox1
             // 
@@ -241,14 +229,14 @@
             // viewLogToolStripMenuItem
             // 
             this.viewLogToolStripMenuItem.Name = "viewLogToolStripMenuItem";
-            this.viewLogToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.viewLogToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.viewLogToolStripMenuItem.Text = "View Log";
             this.viewLogToolStripMenuItem.Click += new System.EventHandler(this.viewLogToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -261,6 +249,13 @@
             this.hELPToolStripMenuItem.Name = "hELPToolStripMenuItem";
             this.hELPToolStripMenuItem.Size = new System.Drawing.Size(47, 21);
             this.hELPToolStripMenuItem.Text = "HELP";
+            // 
+            // supportToolStripMenuItem
+            // 
+            this.supportToolStripMenuItem.Name = "supportToolStripMenuItem";
+            this.supportToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
+            this.supportToolStripMenuItem.Text = "Support";
+            this.supportToolStripMenuItem.Click += new System.EventHandler(this.supportToolStripMenuItem_Click);
             // 
             // resetConfigurationToolStripMenuItem
             // 
@@ -320,18 +315,29 @@
             this.label3.TabIndex = 12;
             this.label3.Text = "label3";
             // 
-            // supportToolStripMenuItem
+            // label4
             // 
-            this.supportToolStripMenuItem.Name = "supportToolStripMenuItem";
-            this.supportToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
-            this.supportToolStripMenuItem.Text = "Support";
-            this.supportToolStripMenuItem.Click += new System.EventHandler(this.supportToolStripMenuItem_Click);
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(36, 295);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(173, 17);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "Maximum number of Tickets";
+            // 
+            // textBoxTicketNo
+            // 
+            this.textBoxTicketNo.Location = new System.Drawing.Point(212, 295);
+            this.textBoxTicketNo.Name = "textBoxTicketNo";
+            this.textBoxTicketNo.Size = new System.Drawing.Size(100, 25);
+            this.textBoxTicketNo.TabIndex = 14;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(568, 501);
+            this.Controls.Add(this.textBoxTicketNo);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.progressBar1);
@@ -339,7 +345,6 @@
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonExport);
             this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.checkBoxExportInvoice);
             this.Controls.Add(this.checkBoxExportTicket);
             this.Controls.Add(this.checkBoxExportCustomer);
             this.Controls.Add(this.groupBox1);
@@ -374,7 +379,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox checkBoxExportCustomer;
         private System.Windows.Forms.CheckBox checkBoxExportTicket;
-        private System.Windows.Forms.CheckBox checkBoxExportInvoice;
         private System.Windows.Forms.Button buttonLogin;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button buttonExport;
@@ -394,6 +398,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ToolStripMenuItem resetConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem supportToolStripMenuItem;
+        private System.Windows.Forms.TextBox textBoxTicketNo;
+        private System.Windows.Forms.Label label4;
     }
 }
 
