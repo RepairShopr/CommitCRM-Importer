@@ -31,6 +31,18 @@ namespace RepairShoprCore
             get;
             set;
         }
+
+        [JsonProperty("success")]
+        public Boolean success { get; set; }
+
+        [JsonProperty("message")]
+        public String[] message { get; set; }
+
+        [JsonProperty("params")]
+        public Param params_ { get; set; }
+
+        [JsonProperty("status")]
+        public String status { get; set; }
     }
 
     public class CustomerListRoot
@@ -42,4 +54,18 @@ namespace RepairShoprCore
             set;
         }
     }
+
+
+    public class Param
+    {
+        [JsonProperty("email")]
+        public String email { get; set; }
+
+        [JsonProperty("firstname")]
+        public String firstname { get; set; }
+
+        [JsonProperty("lastname")]
+        public String lastname { get; set; }
+    }
+
 }

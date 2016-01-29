@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using System.Text.RegularExpressions;
+using Microsoft.Win32;
 using RepairShoprCore;
 using System;
 using System.Collections.Generic;
@@ -162,6 +163,7 @@ namespace RepairShoprApps
 
         private void buttonExport_Click(object sender, EventArgs e)
         {
+
             if (bgw == null)
             {
                 bgw = new BackgroundWorker();
@@ -208,8 +210,12 @@ namespace RepairShoprApps
                 using (SQLiteConnection conn = new SQLiteConnection("data source=" + _path + ";PRAGMA journal_mode=WAL;Password=shyam;"))
                 {
                     conn.Open();
+                    //Shaik: skipping inserting the customer
+                   // _exportCustomer = false;
+
                     if (_exportCustomer)
                     {
+
                         CommitCRM.ObjectQuery<CommitCRM.Account> DefaultAccounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1);
                         DefaultAccounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
                         List<CommitCRM.Account> DefaultAccountResult = DefaultAccounts.FetchObjects();
@@ -307,8 +313,8 @@ namespace RepairShoprApps
                                         myNameValueCollection.Add("firstname", fullname);
                                     myNameValueCollection.Add("lastname", account.LastName);
                                     myNameValueCollection.Add("email", account.EmailAddress1);
-                                    myNameValueCollection.Add("phone", account.Phone1);
-                                    myNameValueCollection.Add("mobile", account.Phone2);
+                                    myNameValueCollection.Add("phone", Regex.Replace(account.Phone1, @"[^.0-9\s]", ""));
+                                    myNameValueCollection.Add("mobile", Regex.Replace(account.Phone2, @"[^.0-9\s]", ""));
                                     myNameValueCollection.Add("address", account.AddressLine1);
                                     myNameValueCollection.Add("address_2", account.AddressLine2);
                                     myNameValueCollection.Add("city", account.City);
