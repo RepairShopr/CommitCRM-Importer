@@ -5,14 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Configuration;
-using System.Data;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
 using System.Text;
 using System.Web;
 using System.Windows.Forms;
@@ -31,7 +27,7 @@ namespace RepairShoprApps
         string installedLocation = string.Empty;
         bool isCompleteCustomer = false;
         bool isCompleteTicket = false;
-        int globalTicketNumber = 17000;                      
+       // int globalTicketNumber = 17000;                      
         public MainForm()
         {
             InitializeComponent();
@@ -170,15 +166,15 @@ namespace RepairShoprApps
             }
             _exportTicket = checkBoxExportTicket.Checked;
             _exportCustomer = checkBoxExportCustomer.Checked;
-            if (_exportTicket)
-            {
-                if (string.IsNullOrEmpty(textBoxTicketNo.Text))
-                {
-                    MessageBox.Show("Please enter maximum number of Tickets", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-            }
-            int.TryParse(textBoxTicketNo.Text.Trim(),out globalTicketNumber);
+            //if (_exportTicket)
+            //{
+            //    if (string.IsNullOrEmpty(textBoxTicketNo.Text))
+            //    {
+            //        MessageBox.Show("Please enter maximum number of Tickets", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //        return;
+            //    }
+            //}
+           // int.TryParse(textBoxTicketNo.Text.Trim(),out globalTicketNumber);
             progressBar1.Value = 0;
             progressBar1.Visible = true;
             progressBar1.Enabled = true;
@@ -210,18 +206,23 @@ namespace RepairShoprApps
                 using (SQLiteConnection conn = new SQLiteConnection("data source=" + _path + ";PRAGMA journal_mode=WAL;Password=shyam;"))
                 {
                     conn.Open();
-                    //Shaik: skipping inserting the customer
-                   // _exportCustomer = false;
+                    CommitCRM.ObjectQuery<CommitCRM.Account> DefaultAccounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1);
+                    DefaultAccounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
+                    List<CommitCRM.Account> DefaultAccountResult = DefaultAccounts.FetchObjects();
+                    DateTime customerExport = Directory.GetCreationTime(installedLocation);
+
+                    DateTime ticketExport = new DateTime();
+                    if (DefaultAccountResult != null && DefaultAccountResult.Count > 0)
+                    {
+                        ticketExport = customerExport = DefaultAccountResult[0].CreationDate;
+                    }
+
 
                     if (_exportCustomer)
                     {
-
-                        CommitCRM.ObjectQuery<CommitCRM.Account> DefaultAccounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1);
-                        DefaultAccounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
-                        List<CommitCRM.Account> DefaultAccountResult = DefaultAccounts.FetchObjects();
-                        DateTime customerExport = Directory.GetCreationTime(installedLocation);
-                        if (DefaultAccountResult != null && DefaultAccountResult.Count > 0)
-                            customerExport = DefaultAccountResult[0].CreationDate;
+                        
+                        //if (DefaultAccountResult != null && DefaultAccountResult.Count > 0)
+                        //    customerExport = DefaultAccountResult[0].CreationDate;
                         if (Properties.Settings.Default.CustomerExport != null && Properties.Settings.Default.CustomerExport > customerExport)
                             customerExport = Properties.Settings.Default.CustomerExport;
                        
@@ -378,7 +379,7 @@ namespace RepairShoprApps
                                 }
                                 index++;
                             }
-                            RepairShoprUtils.LogWriteLineinHTML("Sucessfull Loaded contact up to   " + customerExport.AddMinutes(1).ToString(), MessageSource.Ticket, "", messageType.Information);
+                            RepairShoprUtils.LogWriteLineinHTML("Sucessfull Loaded contact up to   " + customerExport.AddMonths(1).ToString(), MessageSource.Customer, "", messageType.Information);
                             Properties.Settings.Default.CustomerExport = customerExport;
                             Properties.Settings.Default.Save();
                             customerExport = customerExport.AddMonths(1); //Add month by 1
@@ -390,29 +391,49 @@ namespace RepairShoprApps
                     if (_exportTicket)
                     {                     
                        
-                        string startTicket = string.Empty;
-                        int ticketNumber = 0;
-                        CommitCRM.ObjectQuery<CommitCRM.Ticket> DefaultTickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1);
-                        DefaultTickets.AddSortExpression(CommitCRM.Ticket.Fields.TicketNumber, CommitCRM.SortDirectionEnum.sortASC);
-                        List<CommitCRM.Ticket> DefaultTicketResult = DefaultTickets.FetchObjects();
+                        //string startTicket = string.Empty;
+                        //int lastTicket = 0;
+                        //int ticketNumber = 0;
+                        //CommitCRM.ObjectQuery<CommitCRM.Ticket> DefaultTickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1);
+                        //DefaultTickets.AddSortExpression(CommitCRM.Ticket.Fields.TicketNumber, CommitCRM.SortDirectionEnum.sortASC);
+                        //List<CommitCRM.Ticket> DefaultTicketResult = DefaultTickets.FetchObjects();
                         
-                        if (DefaultTicketResult != null && DefaultTicketResult.Count > 0)
-                            startTicket = DefaultTicketResult[0].TicketNumber;
+                        //if (DefaultTicketResult != null && DefaultTicketResult.Count > 0)
+                        //    startTicket = DefaultTicketResult[0].TicketNumber;
 
-                        var partTicketByPart = startTicket.Split('-');
+                        //var partTicketByPart = startTicket.Split('-');
 
-                        if (!string.IsNullOrEmpty(Properties.Settings.Default.TicketNumber))
-                            ticketNumber = int.Parse(Properties.Settings.Default.TicketNumber);
-                        else
-                        {
-                            if (partTicketByPart.Length == 2)
-                            {
-                                ticketNumber = int.Parse(partTicketByPart[1]);
-                            }
-                        }
-//                        if (Properties.Settings.Default.TicketExport != null && Properties.Settings.Default.TicketExport > exportTicket)
-//                            exportTicket = Properties.Settings.Default.TicketExport;                       
-                        while (ticketNumber <globalTicketNumber)
+                        //if (!string.IsNullOrEmpty(Properties.Settings.Default.TicketNumber))
+                        //    ticketNumber = int.Parse(Properties.Settings.Default.TicketNumber);
+                        //else
+                        //{
+                        //    if (partTicketByPart.Length == 2)
+                        //    {
+                        //        ticketNumber = int.Parse(partTicketByPart[1]);
+                        //    }
+                        //}
+                     
+
+                        //if (DefaultTicketResult != null && DefaultTicketResult.Count > 0)
+                        //    startTicket = DefaultTicketResult[0].TicketNumber;
+
+                        //var partTicketByPart = startTicket.Split('-');
+
+                        //if (!string.IsNullOrEmpty(Properties.Settings.Default.TicketNumber))
+                        //    ticketNumber = int.Parse(Properties.Settings.Default.TicketNumber);
+                        //else
+                        //{
+                        //    if (partTicketByPart.Length == 2)
+                        //    {
+                        //        ticketNumber = int.Parse(partTicketByPart[1]);
+                        //    }
+                        //}
+
+                        if (Properties.Settings.Default.TicketExport != null && Properties.Settings.Default.TicketExport > ticketExport)
+                            ticketExport = Properties.Settings.Default.TicketExport;     
+                  
+                       // while (ticketNumber <globalTicketNumber)
+                        while (ticketExport < DateTime.Today)
                         {
                             if (bgw.CancellationPending)
                             {
@@ -424,23 +445,36 @@ namespace RepairShoprApps
                             totalNumer = 0;
                             percentage = 1;
                             ticketIndex = 1;                           
-                            CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 510);
-                            string startIndex=partTicketByPart[0]+"-"+ticketNumber;
-                            Tickets.AddCriteria(CommitCRM.Ticket.Fields.TicketNumber, CommitCRM.OperatorEnum.opGreaterThanOrEqual, startIndex);
-                            string final=partTicketByPart[0]+"-"+(ticketNumber+300);
-                            Tickets.AddCriteria(CommitCRM.Ticket.Fields.TicketNumber, CommitCRM.OperatorEnum.opLessThan, final);
-                            RepairShoprUtils.LogWriteLineinHTML(" Loading Ticket Number from :" + startIndex + " To : " + final, MessageSource.Ticket, "", messageType.Information);
-                            _statusMessage = string.Format("Loading Ticket from Ticket Number: {0}, it will take 2-3 mintues",startIndex);
+                            //CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 510);
+                            //string startIndex=partTicketByPart[0]+"-"+ticketNumber;
+                            //Tickets.AddCriteria(CommitCRM.Ticket.Fields.TicketNumber, CommitCRM.OperatorEnum.opGreaterThanOrEqual, startIndex);
+                            //string final=partTicketByPart[0]+"-"+(ticketNumber+30);
+                            //Tickets.AddCriteria(CommitCRM.Ticket.Fields.TicketNumber, CommitCRM.OperatorEnum.opLessThan, final);
+
+                            RepairShoprUtils.LogWriteLineinHTML(" Loading Tickets from " + ticketExport.ToString() + " to  " + ticketExport.AddMonths(1).ToString(), MessageSource.Ticket, "", messageType.Information);
+                            CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1000);
+                            Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, ticketExport);
+                            Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opLessThan, ticketExport.AddMonths(1));
+                            Tickets.AddSortExpression(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.SortDirectionEnum.sortASC);
+                            _statusMessage = string.Format("Loading Ticket from {0:y}.., it will take 2-3 mintues", ticketExport);
                             bgw.ReportProgress(percentage, index);
-                            List<CommitCRM.Ticket> CommitCRMTicketLists = Tickets.FetchObjects();
+                            
+                            //_statusMessage = string.Format("Loading Ticket from Ticket Number: {0}, it will take 2-3 mintues",startIndex);
+                            var CommitCRMTicketLists = new List<CommitCRM.Ticket>();
+                           CommitCRMTicketLists = Tickets.FetchObjects();
+
+                          
 
                             if (CommitCRMTicketLists != null)
                             {
-                                totalNumer = CommitCRMTicketLists.Count;
-                                ticketCount = CommitCRMTicketLists.Count;
+                                ticketCount  = totalNumer = CommitCRMTicketLists.Count;
                             }
-                            else
-                                continue;
+
+                            //if (ticketCount == 0) 
+                            //{
+                            //    break;
+                            //}
+
                             _statusMessage = "Sending to RepairShopr..";
                             bgw.ReportProgress(percentage, index);                            
                             foreach (CommitCRM.Ticket ticket in CommitCRMTicketLists)
@@ -537,8 +571,16 @@ namespace RepairShoprApps
                                         percentage = (100 * index) / totalNumer;
                                         _statusMessage = string.Format("Exported ( {0}/{1} ) of Ticket", ticketIndex, ticketCount);
                                         bgw.ReportProgress(percentage, index);
-                                        using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Ticket (TicketId,RTicketId) VALUES('{0}','{1}')", ticket.TicketREC_ID, newTicket.Id), conn))
+                                        using (
+                                            SQLiteCommand cmdINewItem =
+                                                new SQLiteCommand(
+                                                    string.Format(
+                                                        "INSERT INTO  Ticket (TicketId,RTicketId) VALUES('{0}','{1}')",
+                                                        ticket.TicketREC_ID, newTicket.Id), conn))
+                                        {
                                             cmdINewItem.ExecuteNonQuery();
+                                        }
+                                            
                                         RepairShoprUtils.LogWriteLineinHTML("Successfully Exported New Ticket in RepairShopr ", MessageSource.Ticket, "", messageType.Information);
                                         ticketIndex++;
                                     }
@@ -554,10 +596,11 @@ namespace RepairShoprApps
                                 index++;
 
                             }
-                            ticketNumber += 300;
-                            RepairShoprUtils.LogWriteLineinHTML("Sucessfull Loaded Ticket up to   " +final, MessageSource.Ticket, "", messageType.Information);
-                            Properties.Settings.Default.TicketNumber = ticketNumber.ToString();
-                            Properties.Settings.Default.Save();                            
+                           
+                            RepairShoprUtils.LogWriteLineinHTML("Sucessfull Loaded Ticket up to   " + ticketExport.AddMonths(1).ToString(), MessageSource.Ticket, "", messageType.Information);
+                            Properties.Settings.Default.TicketExport = ticketExport;
+                            Properties.Settings.Default.Save();
+                            ticketExport = ticketExport.AddMonths(1);
                         }
                         isCompleteTicket = true;
                         bgw.ReportProgress(100, index);
@@ -783,6 +826,7 @@ namespace RepairShoprApps
                 if (DefaultAccountResult != null && DefaultAccountResult.Count > 0)
                     customerExport = DefaultAccountResult[0].CreationDate;
                 Properties.Settings.Default.CustomerExport = customerExport;
+                Properties.Settings.Default.TicketExport = customerExport;
                 Properties.Settings.Default.Save();
 
                 if (result != -1 && rsult != -1)
