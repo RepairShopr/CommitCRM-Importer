@@ -56,8 +56,6 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.buttonStop = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.textBoxTicketNo = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -315,29 +313,11 @@
             this.label3.TabIndex = 12;
             this.label3.Text = "label3";
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(36, 295);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(173, 17);
-            this.label4.TabIndex = 13;
-            this.label4.Text = "Maximum number of Tickets";
-            // 
-            // textBoxTicketNo
-            // 
-            this.textBoxTicketNo.Location = new System.Drawing.Point(212, 295);
-            this.textBoxTicketNo.Name = "textBoxTicketNo";
-            this.textBoxTicketNo.Size = new System.Drawing.Size(100, 25);
-            this.textBoxTicketNo.TabIndex = 14;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(568, 501);
-            this.Controls.Add(this.textBoxTicketNo);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.progressBar1);
@@ -398,8 +378,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ToolStripMenuItem resetConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem supportToolStripMenuItem;
-        private System.Windows.Forms.TextBox textBoxTicketNo;
-        private System.Windows.Forms.Label label4;
     }
 }
 

@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -233,11 +231,14 @@ namespace RepairShoprCore
                 }
                 catch (WebException ex)
                 {
-                    using (Stream data = ex.Response.GetResponseStream())
-                    using (var reader = new StreamReader(data))
+                    if (ex.Response != null)
                     {
-                        string bodyText = reader.ReadToEnd();
-                        RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Contact in RepairShopr . " + bodyText, MessageSource.Contact, ex.Message, messageType.Error);
+                        using (Stream data = ex.Response.GetResponseStream())
+                        using (var reader = new StreamReader(data))
+                        {
+                            string bodyText = reader.ReadToEnd();
+                            RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Contact in RepairShopr . " + bodyText, MessageSource.Contact, ex.Message, messageType.Error);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -265,12 +266,16 @@ namespace RepairShoprCore
                 }
                 catch (WebException ex)
                 {
-                    using (Stream data = ex.Response.GetResponseStream())
-                    using (var reader = new StreamReader(data))
+                    if (ex.Response != null)
                     {
-                        string bodyText = reader.ReadToEnd();
-                        RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Ticket in RepairShopr . " + bodyText, MessageSource.Ticket, ex.StackTrace, messageType.Error);
+                        using (Stream data = ex.Response.GetResponseStream())
+                        using (var reader = new StreamReader(data))
+                        {
+                            string bodyText = reader.ReadToEnd();
+                            RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Ticket in RepairShopr . " + bodyText, MessageSource.Ticket, ex.StackTrace, messageType.Error);
+                        }
                     }
+                   
                 }
                 catch (Exception ex)
                 {
