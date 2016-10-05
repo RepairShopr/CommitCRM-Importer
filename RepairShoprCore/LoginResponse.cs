@@ -52,6 +52,9 @@ namespace RepairShoprCore
         [JsonProperty("user_id")]
         public int UserId { get; set; }
 
+        [JsonProperty("default_location")]
+        public int? DefaulLocationId { get; set; }
+
         [JsonProperty("admin")]
         public bool Admin { get; set; }
 
@@ -64,5 +67,4 @@ namespace RepairShoprCore
         [JsonProperty("Permissions")]
         public Permissions Permissions { get; set; }
     }
-
 }
