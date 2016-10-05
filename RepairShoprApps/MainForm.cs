@@ -241,7 +241,7 @@ namespace RepairShoprApps
                             index = 1;
                             totalcountData = 0;
                             percentage = 1;
-                            CommitCRM.ObjectQuery<CommitCRM.Account> Accounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1000);
+                            CommitCRM.ObjectQuery<CommitCRM.Account> Accounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND);
                             Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opGreaterThan, customerExport);
                             Accounts.AddCriteria(CommitCRM.Account.Fields.CreationDate, CommitCRM.OperatorEnum.opLessThan, customerExport.AddMonths(1));
                             Accounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
@@ -454,7 +454,7 @@ namespace RepairShoprApps
                             //Tickets.AddCriteria(CommitCRM.Ticket.Fields.TicketNumber, CommitCRM.OperatorEnum.opLessThan, final);
 
                             RepairShoprUtils.LogWriteLineinHTML(" Loading Tickets from " + ticketExport.ToString() + " to  " + ticketExport.AddMonths(1).ToString(), MessageSource.Ticket, "", messageType.Information);
-                            CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1000);
+                            CommitCRM.ObjectQuery<CommitCRM.Ticket> Tickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opGreaterThan, ticketExport);
                             Tickets.AddCriteria(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.OperatorEnum.opLessThan, ticketExport.AddMonths(1));
                             Tickets.AddSortExpression(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.SortDirectionEnum.sortASC);
