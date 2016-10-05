@@ -168,6 +168,11 @@ namespace RepairShoprApps
             if (bgw == null)
             {
                 bgw = new BackgroundWorker();
+                bgw.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
+                bgw.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
+                bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_RunWorkerCompleted);
+                bgw.WorkerReportsProgress = true;
+                bgw.WorkerSupportsCancellation = true;
             }
             _exportTicket = checkBoxExportTicket.Checked;
             _exportCustomer = checkBoxExportCustomer.Checked;
@@ -183,11 +188,7 @@ namespace RepairShoprApps
             progressBar1.Value = 0;
             progressBar1.Visible = true;
             progressBar1.Enabled = true;
-            bgw.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
-            bgw.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
-            bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_RunWorkerCompleted);
-            bgw.WorkerReportsProgress = true;
-            bgw.WorkerSupportsCancellation = true;
+
             bgw.RunWorkerAsync();
             buttonStop.Enabled = true;
         }
