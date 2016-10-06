@@ -6,6 +6,7 @@ using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RepairShoprCore
 {
@@ -17,6 +18,7 @@ namespace RepairShoprCore
         public static LoginResponse LoginResponse = null;
         public static string globalURl = string.Empty;
         static int sufix = 1;
+
         public static void LogWriteLineinHTML(string msg, MessageSource source, string exception, messageType msgType)
         {
             string errorPath = string.Empty;
@@ -103,6 +105,7 @@ namespace RepairShoprCore
         {
             return (bytes / 1024f) / 1024f;
         }
+
         public static LoginResponse GetLoginResquest(string username, string password)
         {
             globalURl = ConfigurationManager.AppSettings.Get("HostName");
@@ -155,7 +158,6 @@ namespace RepairShoprCore
                     var jsonResult = Encoding.ASCII.GetString(responseArray);
                     RepairShoprUtils.LogWriteLineinHTML(string.Format("Server Response for Customer : {0} ", jsonResult), MessageSource.Customer, "", messageType.Information);
 
-
                     var res = JsonConvert.DeserializeObject<CustomerRoot>(jsonResult);
                     if (res.success == false && res.status != "unprocessable_entity" && res.customer == null)
                     {
@@ -177,7 +179,6 @@ namespace RepairShoprCore
                             string bodyText = string.Join(" ", res.message);
                             RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Customer in RepairShopr. " + bodyText, MessageSource.Customer, res.params_.email, messageType.Error);
                         }
-
                     }
                     else
                     {
@@ -190,11 +191,20 @@ namespace RepairShoprCore
                 }
                 catch (WebException ex)
                 {
-                    using (Stream data = ex.Response.GetResponseStream())
-                    using (var reader = new StreamReader(data))
+                    if (ex.Response != null)
                     {
-                        string bodyText = reader.ReadToEnd();
-                        RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Customer in RepairShopr. " + bodyText, MessageSource.Customer, ex.Message, messageType.Error);
+                        if ((int)((HttpWebResponse)ex.Response).StatusCode == 429)
+                        {
+                            Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                            return ExportCustomer(myNameValueCollection);
+                        }
+
+                        using (Stream data = ex.Response.GetResponseStream())
+                        using (var reader = new StreamReader(data))
+                        {
+                            string bodyText = reader.ReadToEnd();
+                            RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Customer in RepairShopr. " + bodyText, MessageSource.Customer, ex.Message, messageType.Error);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -227,12 +237,17 @@ namespace RepairShoprCore
                     {
                         RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Customer in RepairShopr. " + contactData.Errors, MessageSource.Contact, contactData.Record, messageType.Error);
                     }
-
                 }
                 catch (WebException ex)
                 {
                     if (ex.Response != null)
                     {
+                        if ((int)((HttpWebResponse)ex.Response).StatusCode == 429)
+                        {
+                            Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                            return ExportContact(myNameValueCollection);
+                        }
+
                         using (Stream data = ex.Response.GetResponseStream())
                         using (var reader = new StreamReader(data))
                         {
@@ -268,6 +283,12 @@ namespace RepairShoprCore
                 {
                     if (ex.Response != null)
                     {
+                        if ((int)((HttpWebResponse)ex.Response).StatusCode == 429)
+                        {
+                            Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                            return ExportTicket(myNameValueCollection);
+                        }
+
                         using (Stream data = ex.Response.GetResponseStream())
                         using (var reader = new StreamReader(data))
                         {
@@ -275,7 +296,6 @@ namespace RepairShoprCore
                             RepairShoprUtils.LogWriteLineinHTML("Failed to Create New Ticket in RepairShopr . " + bodyText, MessageSource.Ticket, ex.StackTrace, messageType.Error);
                         }
                     }
-                   
                 }
                 catch (Exception ex)
                 {
@@ -284,14 +304,15 @@ namespace RepairShoprCore
             }
             return null;
         }
-
     }
+
     public enum messageType
     {
         Information,
         Error,
         Warning
     }
+
     public enum MessageSource
     {
         Customer,
