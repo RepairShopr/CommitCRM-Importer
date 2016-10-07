@@ -356,6 +356,7 @@ namespace RepairShoprApps
 
                     MessageBox.Show("Configuration is reset successfull", "RepairShoprApps", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                conn.Close();
             }
         }
 
