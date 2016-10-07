@@ -1,15 +1,17 @@
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Release\RepairShoprApps.exe.config
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Release\RepairShoprApps.exe
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Release\RepairShoprApps.pdb
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Release\CommitLib.dll
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Release\RepairShoprCore.dll
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Release\System.Data.SQLite.dll
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Release\Newtonsoft.Json.dll
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\bin\Release\RepairShoprCore.pdb
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Release\RepairShoprApps.csprojResolveAssemblyReference.cache
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Release\RepairShoprApps.AboutBox1.resources
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Release\RepairShoprApps.MainForm.resources
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Release\RepairShoprApps.Properties.Resources.resources
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Release\RepairShoprApps.csproj.GenerateResource.Cache
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Release\RepairShoprApps.exe
-C:\Users\IEUser\RepairShoprApps Build 7\RepairShoprApps\obj\Release\RepairShoprApps.pdb
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\RepairShoprApps.exe.config
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\RepairShoprApps.exe.manifest
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\RepairShoprApps.application
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\RepairShoprApps.exe
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\RepairShoprApps.pdb
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\CommitLib.dll
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\Newtonsoft.Json.dll
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\System.Data.SQLite.dll
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\bin\Release\Newtonsoft.Json.xml
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.AboutBox1.resources
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.MainForm.resources
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.Properties.Resources.resources
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.csproj.GenerateResource.Cache
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.exe.manifest
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.application
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.exe
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.pdb
