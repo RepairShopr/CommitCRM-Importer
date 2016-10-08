@@ -15,3 +15,4 @@ C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\Rep
 C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.application
 C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.exe
 C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.pdb
+C:\Users\Vitaliy\Source\Repos\CommitCRM-Importer\RepairShoprApps\obj\Release\RepairShoprApps.csprojResolveAssemblyReference.cache
