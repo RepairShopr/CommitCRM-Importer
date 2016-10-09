@@ -56,5 +56,17 @@ namespace RepairShoprApps.Properties {
                 this["TicketNumber"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string InstalledLocation {
+            get {
+                return ((string)(this["InstalledLocation"]));
+            }
+            set {
+                this["InstalledLocation"] = value;
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using RepairShoprCore;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SQLite;
 using System.Diagnostics;
@@ -17,7 +16,6 @@ namespace RepairShoprApps
         private bool _exportTicket = false;
         private string _statusMessage = string.Empty;
         private string _path = null;
-        private string installedLocation = string.Empty;
         private int? _defaultLocationId;
         private BackgroundWorker _bgw;
 
@@ -25,7 +23,7 @@ namespace RepairShoprApps
         {
             InitializeComponent();
             label1.Text = string.Empty;
-            this.Text = "RepairShoprApps for CommitCRM";
+            this.Text = "CommitCRM Exporter";
             buttonExport.Enabled = false;
             progressBar1.Visible = false;
             label3.Text = "";
@@ -39,29 +37,58 @@ namespace RepairShoprApps
         {
             try
             {
-                string p_name = "CommitCRM";
-                string displayName;
-                RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall");
-                RepairShoprUtils.LogWriteLineinHTML("Reading CommitCRM Install Location from RegistryKey", MessageSource.Initialization, "", messageType.Information);
-                foreach (String keyName in key.GetSubKeyNames())
-                {
-                    RegistryKey subkey = key.OpenSubKey(keyName);
-                    displayName = subkey.GetValue("DisplayName") as string;
-                    if (p_name.Equals(displayName, StringComparison.OrdinalIgnoreCase) == true)
-                    {
-                        installedLocation = subkey.GetValue("InstallLocation") as string;
-                        RepairShoprUtils.LogWriteLineinHTML(string.Format("CommitCRM Install Directiory is '{0}'", installedLocation), MessageSource.Initialization, "", messageType.Information);
+                bool folderExist = false;
 
-                        RepairShoprUtils.LogWriteLineinHTML("Setting CommitCRM Parameter such as DLL folder and DB Folder", MessageSource.Initialization, "", messageType.Information);
-                        CommitCRM.Config config = new CommitCRM.Config();
-                        config.AppName = "RepairShopr";
-                        config.CommitDllFolder = Path.Combine(installedLocation, "ThirdParty", "UserDev");
-                        config.CommitDbFolder = Path.Combine(installedLocation, "db");
-                        CommitCRM.Application.Initialize(config);
-                        RepairShoprUtils.LogWriteLineinHTML("Successfully configure CommitCRM ", MessageSource.Initialization, "", messageType.Information);
-                        break;
+                if (!string.IsNullOrEmpty(Properties.Settings.Default.InstalledLocation))
+                    folderExist = Directory.Exists(Properties.Settings.Default.InstalledLocation);
+
+                if (!folderExist)
+                {
+                    string p_name = "CommitCRM";
+                    string installedLocation = null;
+
+                    RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall");
+                    RepairShoprUtils.LogWriteLineinHTML("Reading CommitCRM Install Location from RegistryKey", MessageSource.Initialization, "", messageType.Information);
+                    foreach (var keyName in key.GetSubKeyNames())
+                    {
+                        RegistryKey subkey = key.OpenSubKey(keyName);
+                        var displayName = subkey.GetValue("DisplayName") as string;
+                        if (p_name.Equals(displayName, StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            installedLocation = subkey.GetValue("InstallLocation") as string;
+                            RepairShoprUtils.LogWriteLineinHTML(string.Format("CommitCRM Install Directiory is '{0}'", installedLocation), MessageSource.Initialization, "", messageType.Information);
+                            break;
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(installedLocation))
+                    {
+                        if (MessageBox.Show("CommitCRM location is not found. Would you like to browse it now?", this.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                        {
+                            var dialog = new FolderBrowserDialog();
+                            dialog.ShowNewFolderButton = false;
+                            if (dialog.ShowDialog() == DialogResult.OK)
+                                installedLocation = dialog.SelectedPath;
+                        }
+                    }
+
+                    Properties.Settings.Default.InstalledLocation = installedLocation;
+                    Properties.Settings.Default.Save();
+
+                    if (string.IsNullOrEmpty(Properties.Settings.Default.InstalledLocation))
+                    {
+                        RepairShoprUtils.LogWriteLineinHTML("CommitCRM is not configured", MessageSource.Initialization, "", messageType.Information);
+                        return;
                     }
                 }
+
+                RepairShoprUtils.LogWriteLineinHTML("Setting CommitCRM Parameter such as DLL folder and DB Folder", MessageSource.Initialization, "", messageType.Information);
+                var config = new CommitCRM.Config();
+                config.AppName = "RepairShopr";
+                config.CommitDllFolder = Path.Combine(Properties.Settings.Default.InstalledLocation, "ThirdParty", "UserDev");
+                config.CommitDbFolder = Path.Combine(Properties.Settings.Default.InstalledLocation, "db");
+                CommitCRM.Application.Initialize(config);
+                RepairShoprUtils.LogWriteLineinHTML("Successfully configure CommitCRM", MessageSource.Initialization, "", messageType.Information);
             }
             catch (CommitCRM.Exception exc)
             {
@@ -148,13 +175,20 @@ namespace RepairShoprApps
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            CommitCRM.Application.Terminate();
             this.Close();
         }
 
         private void buttonExport_Click(object sender, EventArgs e)
         {
             RepairShoprUtils.LogWriteLineinHTML("Export Button Clicked", MessageSource.Login, "", messageType.Information);
+
+            if (string.IsNullOrEmpty(Properties.Settings.Default.InstalledLocation))
+                CommitCRMHandle();
+            if (string.IsNullOrEmpty(Properties.Settings.Default.InstalledLocation))
+            {
+                MessageBox.Show("CommitCRM location is not browsed. The export operation is terminated", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             if (_bgw == null)
             {
@@ -177,22 +211,28 @@ namespace RepairShoprApps
             buttonStop.Enabled = true;
         }
 
+        private DateTime GetCreationDate()
+        {
+            var defaultAccounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1);
+            defaultAccounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
+            var defaultAccountResult = defaultAccounts.FetchObjects();
+
+            var date = Directory.GetCreationTime(Properties.Settings.Default.InstalledLocation);
+            if (defaultAccountResult != null && defaultAccountResult.Count > 0)
+                date = defaultAccountResult[0].CreationDate;
+
+            return date;
+        }
+
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             try
             {
                 var connectionString = "data source=" + _path + ";PRAGMA journal_mode=WAL;Password=shyam;";
 
-                var defaultAccounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1);
-                defaultAccounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
-                var defaultAccountResult = defaultAccounts.FetchObjects();
-
-                DateTime customerExport = Directory.GetCreationTime(installedLocation);
-                DateTime ticketExport = new DateTime();
-                if (defaultAccountResult != null && defaultAccountResult.Count > 0)
-                {
-                    ticketExport = customerExport = defaultAccountResult[0].CreationDate;
-                }
+                DateTime customerExport;
+                DateTime ticketExport;
+                ticketExport = customerExport = GetCreationDate();
 
                 #region Customer Export
                 if (_exportCustomer)
@@ -332,29 +372,25 @@ namespace RepairShoprApps
                     rsult = cmdTicketDelete.ExecuteNonQuery();
                 }
 
-                CommitCRM.ObjectQuery<CommitCRM.Ticket> DefaultTickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1);
-                DefaultTickets.AddSortExpression(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.SortDirectionEnum.sortASC);
-                List<CommitCRM.Ticket> DefaultTicketResult = DefaultTickets.FetchObjects();
+                var defaultTickets = new CommitCRM.ObjectQuery<CommitCRM.Ticket>(CommitCRM.LinkEnum.linkAND, 1);
+                defaultTickets.AddSortExpression(CommitCRM.Ticket.Fields.UpdateDate, CommitCRM.SortDirectionEnum.sortASC);
+
+                var defaultTicketResult = defaultTickets.FetchObjects();
                 string ticketNumber = string.Empty;
-                if (DefaultTicketResult != null && DefaultTicketResult.Count > 0)
-                    ticketNumber = DefaultTicketResult[0].TicketNumber;
+                if (defaultTicketResult != null && defaultTicketResult.Count > 0)
+                    ticketNumber = defaultTicketResult[0].TicketNumber;
                 Properties.Settings.Default.TicketNumber = ticketNumber;
 
-                CommitCRM.ObjectQuery<CommitCRM.Account> DefaultAccounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1);
-                DefaultAccounts.AddSortExpression(CommitCRM.Account.Fields.CreationDate, CommitCRM.SortDirectionEnum.sortASC);
-                List<CommitCRM.Account> DefaultAccountResult = DefaultAccounts.FetchObjects();
-                DateTime customerExport = Directory.GetCreationTime(installedLocation);
-                if (DefaultAccountResult != null && DefaultAccountResult.Count > 0)
-                    customerExport = DefaultAccountResult[0].CreationDate;
-                Properties.Settings.Default.CustomerExport = customerExport;
-                Properties.Settings.Default.TicketExport = customerExport;
+                var creationDate = GetCreationDate();
+                Properties.Settings.Default.CustomerExport = creationDate;
+                Properties.Settings.Default.TicketExport = creationDate;
                 Properties.Settings.Default.Save();
 
                 if (result != -1 && rsult != -1)
                 {
-                    RepairShoprUtils.LogWriteLineinHTML("Reset Configuration including Database successfull.. ", MessageSource.Initialization, "", messageType.Information);
+                    RepairShoprUtils.LogWriteLineinHTML("Reset Configuration including Database successfull.", MessageSource.Initialization, "", messageType.Information);
 
-                    MessageBox.Show("Configuration is reset successfull", "RepairShoprApps", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Configuration is reset successfull", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 conn.Close();
             }
@@ -363,6 +399,12 @@ namespace RepairShoprApps
         private void supportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("http://feedback.repairshopr.com/knowledgebase/articles/796074");
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            CommitCRM.Application.Terminate();
+            base.OnFormClosing(e);
         }
     }
 }
