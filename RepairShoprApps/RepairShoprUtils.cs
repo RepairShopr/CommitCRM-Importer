@@ -116,7 +116,7 @@ namespace RepairShoprCore
                     NameValueCollection myNameValueCollection = new NameValueCollection();
                     myNameValueCollection.Add("email", username);
                     myNameValueCollection.Add("password", password);
-                    string url = string.Format("http://admin.{0}/api/v1/sign_in", globalURl.Trim());
+                    string url = string.Format("https://admin.{0}/api/v1/sign_in", globalURl.Trim());
                     var responseArray = myWebClient.UploadValues(url, "POST", myNameValueCollection);
                     string jsonResult = Encoding.ASCII.GetString(responseArray);
                     LoginResponse = JsonConvert.DeserializeObject<LoginResponse>(jsonResult);
@@ -152,7 +152,7 @@ namespace RepairShoprCore
                 {
                     RepairShoprUtils.LogWriteLineinHTML("Sending new Customer Parameter to RepairShopr ", MessageSource.Customer, "", messageType.Information);
                     //string urls = "http://example.repairshopr.com/api/v1/customers.json?api_key=123123";
-                    string urls = string.Format("http://{0}.{1}/api/v1/customers.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
+                    string urls = string.Format("https://{0}.{1}/api/v1/customers.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
                     var responseArray = myWebClient.UploadValues(urls, "POST", myNameValueCollection);
 
                     var jsonResult = Encoding.ASCII.GetString(responseArray);
@@ -166,7 +166,7 @@ namespace RepairShoprCore
                         var email = (string)obj["params"]["email"];
                         if (string.IsNullOrEmpty(email))
                             return null;
-                        string url = string.Format("http://{0}.{1}/api/v1/customers/autocomplete?api_key={2}&query={3}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim(), email);
+                        string url = string.Format("https://{0}.{1}/api/v1/customers/autocomplete?api_key={2}&query={3}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim(), email);
                         var result = myWebClient.DownloadString(url);
                         var rootCustomer = JsonConvert.DeserializeObject<CustomerListRoot>(result);
                         if (rootCustomer != null)
@@ -222,7 +222,7 @@ namespace RepairShoprCore
                 try
                 {
                     RepairShoprUtils.LogWriteLineinHTML("Sending new Contact Parameter to RepairShopr ", MessageSource.Contact, "", messageType.Information);
-                    string urls = string.Format("http://{0}.{1}/api/v1/contacts.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
+                    string urls = string.Format("https://{0}.{1}/api/v1/contacts.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
                     var responseArray = myWebClient.UploadValues(urls, "POST", myNameValueCollection);
                     string jsonResult = Encoding.ASCII.GetString(responseArray);
                     RepairShoprUtils.LogWriteLineinHTML(string.Format("Server Response for Contact : {0} ", jsonResult), MessageSource.Customer, "", messageType.Information);
@@ -271,10 +271,10 @@ namespace RepairShoprCore
                 try
                 {
                     RepairShoprUtils.LogWriteLineinHTML("Sending new Ticket Parameter to RepairShopr ", MessageSource.Ticket, "", messageType.Information);
-                    string urls = string.Format("http://{0}.{1}/api/v1/tickets.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
+                    string urls = string.Format("https://{0}.{1}/api/v1/tickets.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
                     var responseArray = myWebClient.UploadValues(urls, "POST", myNameValueCollection);
                     string jsonResult = Encoding.ASCII.GetString(responseArray);
-                    RepairShoprUtils.LogWriteLineinHTML(string.Format("Server Response for Ticket : {0} ", jsonResult), MessageSource.Customer, "", messageType.Information);
+                    RepairShoprUtils.LogWriteLineinHTML(string.Format("Server Response for Ticket : {0} ", jsonResult), MessageSource.Ticket, "", messageType.Information);
                     var ticketData = JsonConvert.DeserializeObject<TicketRoot>(jsonResult);
                     if (ticketData != null && ticketData.ticket != null)
                         return ticketData.ticket;
