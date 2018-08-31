@@ -14,6 +14,7 @@ namespace RepairShoprApps
     {
         private bool _exportCustomer = false;
         private bool _exportTicket = false;
+        private string _remoteHost = "repairshopr.com";
         private string _statusMessage = string.Empty;
         private string _path = null;
         private int? _defaultLocationId;
@@ -156,7 +157,7 @@ namespace RepairShoprApps
                 label1.ForeColor = Color.Green;
             }
             RepairShoprUtils.LogWriteLineinHTML("Sending User Name and Password for Authentication", MessageSource.Login, "", messageType.Information);
-            LoginResponse result = RepairShoprUtils.GetLoginResquest(textBoxUserName.Text.Trim(), textBoxPassWord.Text.Trim()); //"shyam@gmail.com", "shyambct525"
+            LoginResponse result = RepairShoprUtils.GetLoginResquest(textBoxUserName.Text.Trim(), textBoxPassWord.Text.Trim(), _remoteHost);
             if (result != null)
             {
                 label1.Text = "Login Successful";
@@ -203,6 +204,11 @@ namespace RepairShoprApps
             _exportTicket = checkBoxExportTicket.Checked;
             _exportCustomer = checkBoxExportCustomer.Checked;
 
+            if (radioButtonRepairShopr.Checked)
+                _remoteHost = "repairshopr.com";
+            else
+                _remoteHost = "syncromsp.com";
+
             progressBar1.Value = 0;
             progressBar1.Visible = true;
             progressBar1.Enabled = true;
@@ -218,8 +224,9 @@ namespace RepairShoprApps
             var defaultAccountResult = defaultAccounts.FetchObjects();
 
             var date = Directory.GetCreationTime(Properties.Settings.Default.InstalledLocation);
-            if (defaultAccountResult != null && defaultAccountResult.Count > 0)
-                date = defaultAccountResult[0].CreationDate;
+
+//            if (defaultAccountResult != null && defaultAccountResult.Count > 0)
+//                date = defaultAccountResult[0].CreationDate;
 
             return date;
         }
@@ -237,9 +244,6 @@ namespace RepairShoprApps
                 #region Customer Export
                 if (_exportCustomer)
                 {
-                    if (Properties.Settings.Default.CustomerExport != null && Properties.Settings.Default.CustomerExport > customerExport)
-                        customerExport = Properties.Settings.Default.CustomerExport;
-
                     var exporter = new CustomerExporter(connectionString, () => ((BackgroundWorker)sender).CancellationPending);
                     exporter.ReportStatusEvent += (message) =>
                     {
@@ -256,7 +260,7 @@ namespace RepairShoprApps
                         RepairShoprUtils.LogWriteLineinHTML(message, MessageSource.Customer, exception?.ToString(), messageType.Error);
                     };
 
-                    var task = exporter.Export(customerExport);
+                    var task = exporter.Export(customerExport, _remoteHost);
                     task.Wait();
                 }
                 #endregion
@@ -283,7 +287,7 @@ namespace RepairShoprApps
                         RepairShoprUtils.LogWriteLineinHTML(message, MessageSource.Customer, exception?.ToString(), messageType.Error);
                     };
 
-                    var task = exporter.Export(ticketExport);
+                    var task = exporter.Export(ticketExport, _remoteHost);
                     task.Wait();
                 }
                 #endregion
@@ -405,6 +409,32 @@ namespace RepairShoprApps
         {
             CommitCRM.Application.Terminate();
             base.OnFormClosing(e);
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonRepairShopr.Checked)
+            {
+                _remoteHost = "repairshopr.com";
+            }
+        }
+
+        private void radioButtonSyncro_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonSyncro.Checked)
+            {
+                _remoteHost = "syncromsp.com";
+            }
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

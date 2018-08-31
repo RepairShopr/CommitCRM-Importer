@@ -32,7 +32,7 @@ namespace RepairShoprApps
             _ticketGroups = new List<IEnumerable<CommitCRM.Ticket>>();
         }
 
-        public async Task Export(DateTime fromDate)
+        public async Task Export(DateTime fromDate, string remoteHost)
         {
             DateTime startDate = fromDate;
             DateTime endDate = startDate.AddMonths(DATE_RANGE_TO_LOAD);
@@ -63,7 +63,7 @@ namespace RepairShoprApps
                     var tasks = new List<Task>();
                     foreach (var group in _ticketGroups)
                     {
-                        var task = ExportMultipleTickets(group, connection);
+                        var task = ExportMultipleTickets(group, connection, remoteHost);
                         tasks.Add(task);
 
                         if (tasks.Count == MAX_THREADS_COUNT)
@@ -74,9 +74,6 @@ namespace RepairShoprApps
                     }
 
                     await Task.WhenAll(tasks);
-
-                    Properties.Settings.Default.TicketExport = startDate;
-                    Properties.Settings.Default.Save();
 
                     startDate = endDate;
                     endDate = startDate.AddMonths(DATE_RANGE_TO_LOAD);
@@ -118,7 +115,7 @@ namespace RepairShoprApps
             });
         }
 
-        private async Task ExportMultipleTickets(IEnumerable<CommitCRM.Ticket> tickets, SQLiteConnection connection)
+        private async Task ExportMultipleTickets(IEnumerable<CommitCRM.Ticket> tickets, SQLiteConnection connection, string remoteHost)
         {
             foreach (CommitCRM.Ticket ticket in tickets)
             {
@@ -158,7 +155,7 @@ namespace RepairShoprApps
 
                     if (string.IsNullOrEmpty(customerId))
                     {
-                        var customer = await CreateCustomerForTicket(ticket, connection);
+                        var customer = await CreateCustomerForTicket(ticket, connection, remoteHost);
                         if (customer != null)
                             customerId = customer.Id;
                         else
@@ -174,7 +171,7 @@ namespace RepairShoprApps
                     ReportStatusEvent?.Invoke(message);
                     ReportProgressEvent?.Invoke(_index, (100 * _index) / _ticketCount, false);
 
-                    var result = await ExportSingleTicket(ticket, _defaultLocationId, customerId, connection);
+                    var result = await ExportSingleTicket(ticket, _defaultLocationId, customerId, connection, remoteHost);
                     if (result == null)
                     {
                         message = string.Format("Unable to create Ticket: {0}", ticket.Description);

@@ -19,7 +19,7 @@ namespace RepairShoprApps
     internal abstract class BaseExporter
     {
         #region Methods
-        protected async Task<Customer> ExportSingleCustomer(CommitCRM.Account account, SQLiteConnection connection)
+        protected async Task<Customer> ExportSingleCustomer(CommitCRM.Account account, SQLiteConnection connection, string remoteHost)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -41,7 +41,7 @@ namespace RepairShoprApps
                 myNameValueCollection.Add("zip", account.Zip);
                 myNameValueCollection.Add("notes", account.Notes);
 
-                var newCustomer = RepairShoprUtils.ExportCustomer(myNameValueCollection);
+                var newCustomer = RepairShoprUtils.ExportCustomer(myNameValueCollection, remoteHost);
                 if (newCustomer != null)
                 {
                     using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Account (AccountId,CustomerId) VALUES('{0}','{1}')", account.AccountREC_ID, newCustomer.Id), connection))
@@ -68,7 +68,7 @@ namespace RepairShoprApps
                         contactNameCollection.Add("customer_id", newCustomer.Id);
                         contactNameCollection.Add("name", contactname);
 
-                        RepairShoprUtils.ExportContact(contactNameCollection);
+                        RepairShoprUtils.ExportContact(contactNameCollection, remoteHost);
                     }
                 }
 
@@ -76,7 +76,7 @@ namespace RepairShoprApps
             });
         }
 
-        protected async Task<Ticket> ExportSingleTicket(CommitCRM.Ticket ticket, int? defaultLocationId, string customerId, SQLiteConnection connection)
+        protected async Task<Ticket> ExportSingleTicket(CommitCRM.Ticket ticket, int? defaultLocationId, string customerId, SQLiteConnection connection, string remoteHost)
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -105,7 +105,7 @@ namespace RepairShoprApps
                 string createDate = HttpUtility.UrlEncode(ticket.UpdateDate.ToString("yyyy-MM-dd H:mm:ss"));
                 myNameValueCollection.Add("created_at", createDate);
 
-                var newTicket = RepairShoprUtils.ExportTicket(myNameValueCollection);
+                var newTicket = RepairShoprUtils.ExportTicket(myNameValueCollection, remoteHost);
                 if (newTicket != null)
                 {
                     using (SQLiteCommand cmdINewItem = new SQLiteCommand(string.Format("INSERT INTO  Ticket (TicketId,RTicketId) VALUES('{0}','{1}')", ticket.TicketREC_ID, newTicket.Id), connection))
@@ -116,7 +116,7 @@ namespace RepairShoprApps
             });
         }
 
-        protected async Task<Customer> CreateCustomerForTicket(CommitCRM.Ticket ticket, SQLiteConnection connection)
+        protected async Task<Customer> CreateCustomerForTicket(CommitCRM.Ticket ticket, SQLiteConnection connection, string remoteHost)
         {
             var accounts = new CommitCRM.ObjectQuery<CommitCRM.Account>(CommitCRM.LinkEnum.linkAND, 1);
             accounts.AddCriteria(CommitCRM.Account.Fields.AccountREC_ID, CommitCRM.OperatorEnum.opEqual, ticket.AccountREC_ID);
@@ -125,7 +125,7 @@ namespace RepairShoprApps
             var account = accountsResult.SingleOrDefault();
 
             if (account != null)
-                return await ExportSingleCustomer(account, connection);
+                return await ExportSingleCustomer(account, connection, remoteHost);
             else
                 return null;
         }

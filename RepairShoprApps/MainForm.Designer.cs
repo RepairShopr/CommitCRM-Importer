@@ -39,7 +39,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.checkBoxExportCustomer = new System.Windows.Forms.CheckBox();
             this.checkBoxExportTicket = new System.Windows.Forms.CheckBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.buttonExport = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -50,16 +49,16 @@
             this.supportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.errorProvider2 = new System.Windows.Forms.ErrorProvider(this.components);
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.buttonStop = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.radioButtonRepairShopr = new System.Windows.Forms.RadioButton();
+            this.radioButtonSyncro = new System.Windows.Forms.RadioButton();
+            this.label4 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider2)).BeginInit();
             this.SuspendLayout();
@@ -80,14 +79,15 @@
             this.groupBox1.Size = new System.Drawing.Size(523, 143);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "RepairShopr Login";
+            this.groupBox1.Text = "Login";
+            this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(261, 111);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 17);
+            this.label1.Size = new System.Drawing.Size(55, 23);
             this.label1.TabIndex = 9;
             this.label1.Text = "label1";
             // 
@@ -108,7 +108,7 @@
             this.textBoxPassWord.Location = new System.Drawing.Point(149, 65);
             this.textBoxPassWord.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.textBoxPassWord.Name = "textBoxPassWord";
-            this.textBoxPassWord.Size = new System.Drawing.Size(242, 25);
+            this.textBoxPassWord.Size = new System.Drawing.Size(242, 29);
             this.textBoxPassWord.TabIndex = 3;
             this.textBoxPassWord.UseSystemPasswordChar = true;
             this.textBoxPassWord.TextChanged += new System.EventHandler(this.textBoxPassWord_TextChanged);
@@ -118,7 +118,7 @@
             this.textBoxUserName.Location = new System.Drawing.Point(149, 33);
             this.textBoxUserName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.textBoxUserName.Name = "textBoxUserName";
-            this.textBoxUserName.Size = new System.Drawing.Size(242, 25);
+            this.textBoxUserName.Size = new System.Drawing.Size(242, 29);
             this.textBoxUserName.TabIndex = 2;
             this.textBoxUserName.TextChanged += new System.EventHandler(this.textBoxUserName_TextChanged);
             // 
@@ -127,7 +127,7 @@
             this.Password.AutoSize = true;
             this.Password.Location = new System.Drawing.Point(72, 65);
             this.Password.Name = "Password";
-            this.Password.Size = new System.Drawing.Size(71, 17);
+            this.Password.Size = new System.Drawing.Size(89, 23);
             this.Password.TabIndex = 1;
             this.Password.Text = "Password :";
             // 
@@ -136,7 +136,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(19, 33);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(124, 17);
+            this.label2.Size = new System.Drawing.Size(160, 23);
             this.label2.TabIndex = 0;
             this.label2.Text = "User Name (Email) :";
             // 
@@ -149,9 +149,9 @@
             this.checkBoxExportCustomer.Location = new System.Drawing.Point(36, 322);
             this.checkBoxExportCustomer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBoxExportCustomer.Name = "checkBoxExportCustomer";
-            this.checkBoxExportCustomer.Size = new System.Drawing.Size(224, 21);
+            this.checkBoxExportCustomer.Size = new System.Drawing.Size(167, 27);
             this.checkBoxExportCustomer.TabIndex = 2;
-            this.checkBoxExportCustomer.Text = "Export Customers to RepairShopr";
+            this.checkBoxExportCustomer.Text = "Export Customers";
             this.checkBoxExportCustomer.UseVisualStyleBackColor = true;
             this.checkBoxExportCustomer.CheckedChanged += new System.EventHandler(this.checkBoxExportCustomer_CheckedChanged);
             // 
@@ -164,20 +164,10 @@
             this.checkBoxExportTicket.Location = new System.Drawing.Point(36, 346);
             this.checkBoxExportTicket.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBoxExportTicket.Name = "checkBoxExportTicket";
-            this.checkBoxExportTicket.Size = new System.Drawing.Size(201, 21);
+            this.checkBoxExportTicket.Size = new System.Drawing.Size(137, 27);
             this.checkBoxExportTicket.TabIndex = 3;
-            this.checkBoxExportTicket.Text = "Export Tickets to RepairShopr";
+            this.checkBoxExportTicket.Text = "Export Tickets";
             this.checkBoxExportTicket.UseVisualStyleBackColor = true;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::RepairShoprApps.Properties.Resources.logo;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 29);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(400, 107);
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
             // 
             // buttonExport
             // 
@@ -205,12 +195,13 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.hELPToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(568, 25);
+            this.menuStrip1.Size = new System.Drawing.Size(568, 31);
             this.menuStrip1.TabIndex = 8;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -221,20 +212,20 @@
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(42, 21);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(52, 27);
             this.fileToolStripMenuItem.Text = "FILE";
             // 
             // viewLogToolStripMenuItem
             // 
             this.viewLogToolStripMenuItem.Name = "viewLogToolStripMenuItem";
-            this.viewLogToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.viewLogToolStripMenuItem.Size = new System.Drawing.Size(155, 28);
             this.viewLogToolStripMenuItem.Text = "View Log";
             this.viewLogToolStripMenuItem.Click += new System.EventHandler(this.viewLogToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(155, 28);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -245,38 +236,29 @@
             this.resetConfigurationToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.hELPToolStripMenuItem.Name = "hELPToolStripMenuItem";
-            this.hELPToolStripMenuItem.Size = new System.Drawing.Size(47, 21);
+            this.hELPToolStripMenuItem.Size = new System.Drawing.Size(55, 27);
             this.hELPToolStripMenuItem.Text = "HELP";
             // 
             // supportToolStripMenuItem
             // 
             this.supportToolStripMenuItem.Name = "supportToolStripMenuItem";
-            this.supportToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
+            this.supportToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
             this.supportToolStripMenuItem.Text = "Support";
             this.supportToolStripMenuItem.Click += new System.EventHandler(this.supportToolStripMenuItem_Click);
             // 
             // resetConfigurationToolStripMenuItem
             // 
             this.resetConfigurationToolStripMenuItem.Name = "resetConfigurationToolStripMenuItem";
-            this.resetConfigurationToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
+            this.resetConfigurationToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
             this.resetConfigurationToolStripMenuItem.Text = "Reset Configuration";
             this.resetConfigurationToolStripMenuItem.Click += new System.EventHandler(this.resetConfigurationToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(179, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(215, 26);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.pictureBox2.Location = new System.Drawing.Point(399, 29);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(157, 107);
-            this.pictureBox2.TabIndex = 9;
-            this.pictureBox2.TabStop = false;
             // 
             // errorProvider1
             // 
@@ -309,22 +291,57 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(36, 380);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(43, 17);
+            this.label3.Size = new System.Drawing.Size(55, 23);
             this.label3.TabIndex = 12;
             this.label3.Text = "label3";
             // 
+            // radioButtonRepairShopr
+            // 
+            this.radioButtonRepairShopr.AutoSize = true;
+            this.radioButtonRepairShopr.Checked = true;
+            this.radioButtonRepairShopr.Location = new System.Drawing.Point(56, 77);
+            this.radioButtonRepairShopr.Name = "radioButtonRepairShopr";
+            this.radioButtonRepairShopr.Size = new System.Drawing.Size(124, 27);
+            this.radioButtonRepairShopr.TabIndex = 13;
+            this.radioButtonRepairShopr.TabStop = true;
+            this.radioButtonRepairShopr.Text = "RepairShopr";
+            this.radioButtonRepairShopr.UseVisualStyleBackColor = true;
+            this.radioButtonRepairShopr.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            // 
+            // radioButtonSyncro
+            // 
+            this.radioButtonSyncro.AutoSize = true;
+            this.radioButtonSyncro.Location = new System.Drawing.Point(201, 77);
+            this.radioButtonSyncro.Name = "radioButtonSyncro";
+            this.radioButtonSyncro.Size = new System.Drawing.Size(82, 27);
+            this.radioButtonSyncro.TabIndex = 14;
+            this.radioButtonSyncro.Text = "Syncro";
+            this.radioButtonSyncro.UseVisualStyleBackColor = true;
+            this.radioButtonSyncro.CheckedChanged += new System.EventHandler(this.radioButtonSyncro_CheckedChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(29, 42);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(70, 23);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Product";
+            this.label4.Click += new System.EventHandler(this.label4_Click);
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(568, 501);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.radioButtonSyncro);
+            this.Controls.Add(this.radioButtonRepairShopr);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonExport);
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.checkBoxExportTicket);
             this.Controls.Add(this.checkBoxExportCustomer);
             this.Controls.Add(this.groupBox1);
@@ -339,10 +356,8 @@
             this.Text = "Form1";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider2)).EndInit();
             this.ResumeLayout(false);
@@ -360,7 +375,6 @@
         private System.Windows.Forms.CheckBox checkBoxExportCustomer;
         private System.Windows.Forms.CheckBox checkBoxExportTicket;
         private System.Windows.Forms.Button buttonLogin;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button buttonExport;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.MenuStrip menuStrip1;
@@ -369,7 +383,6 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hELPToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-        private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ErrorProvider errorProvider1;
         private System.Windows.Forms.ErrorProvider errorProvider2;
@@ -378,6 +391,9 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ToolStripMenuItem resetConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem supportToolStripMenuItem;
+        private System.Windows.Forms.RadioButton radioButtonRepairShopr;
+        private System.Windows.Forms.RadioButton radioButtonSyncro;
+        private System.Windows.Forms.Label label4;
     }
 }
 

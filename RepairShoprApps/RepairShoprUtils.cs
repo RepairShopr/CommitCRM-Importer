@@ -12,11 +12,11 @@ namespace RepairShoprCore
 {
     public class RepairShoprUtils
     {
-        public static string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Repairshopr");
+        public static string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RepairShopr");
         public static string path = folderPath + "\\" + string.Format("RepairshoprLog_{0}{1}.Html", DateTime.Today.Date.ToString("dd/MM/yyyy").Replace("/", "_"), string.Empty);//Path.Combine(folderPath, "KarmaCRMLog.Html");
         private static readonly object Obj = new object();
         public static LoginResponse LoginResponse = null;
-        public static string globalURl = string.Empty;
+
         static int sufix = 1;
 
         public static void LogWriteLineinHTML(string msg, MessageSource source, string exception, messageType msgType)
@@ -106,9 +106,8 @@ namespace RepairShoprCore
             return (bytes / 1024f) / 1024f;
         }
 
-        public static LoginResponse GetLoginResquest(string username, string password)
+        public static LoginResponse GetLoginResquest(string username, string password, string remoteHost)
         {
-            globalURl = ConfigurationManager.AppSettings.Get("HostName");
             using (WebClient myWebClient = new WebClient())
             {
                 try
@@ -116,7 +115,7 @@ namespace RepairShoprCore
                     NameValueCollection myNameValueCollection = new NameValueCollection();
                     myNameValueCollection.Add("email", username);
                     myNameValueCollection.Add("password", password);
-                    string url = string.Format("https://admin.{0}/api/v1/sign_in", globalURl.Trim());
+                    string url = string.Format("https://admin.{0}/api/v1/sign_in", remoteHost);
                     var responseArray = myWebClient.UploadValues(url, "POST", myNameValueCollection);
                     string jsonResult = Encoding.ASCII.GetString(responseArray);
                     LoginResponse = JsonConvert.DeserializeObject<LoginResponse>(jsonResult);
@@ -144,7 +143,7 @@ namespace RepairShoprCore
             return null;
         }
 
-        public static Customer ExportCustomer(NameValueCollection myNameValueCollection)
+        public static Customer ExportCustomer(NameValueCollection myNameValueCollection, string remoteHost)
         {
             using (WebClient myWebClient = new WebClient())
             {
@@ -152,7 +151,7 @@ namespace RepairShoprCore
                 {
                     RepairShoprUtils.LogWriteLineinHTML("Sending new Customer Parameter to RepairShopr ", MessageSource.Customer, "", messageType.Information);
                     //string urls = "http://example.repairshopr.com/api/v1/customers.json?api_key=123123";
-                    string urls = string.Format("https://{0}.{1}/api/v1/customers.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
+                    string urls = string.Format("https://{0}.{1}/api/v1/customers.json?api_key={2}", LoginResponse.Subdomain.Trim(), remoteHost, LoginResponse.UserToken.Trim());
                     var responseArray = myWebClient.UploadValues(urls, "POST", myNameValueCollection);
 
                     var jsonResult = Encoding.ASCII.GetString(responseArray);
@@ -166,7 +165,7 @@ namespace RepairShoprCore
                         var email = (string)obj["params"]["email"];
                         if (string.IsNullOrEmpty(email))
                             return null;
-                        string url = string.Format("https://{0}.{1}/api/v1/customers/autocomplete?api_key={2}&query={3}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim(), email);
+                        string url = string.Format("https://{0}.{1}/api/v1/customers/autocomplete?api_key={2}&query={3}", LoginResponse.Subdomain.Trim(), remoteHost, LoginResponse.UserToken.Trim(), email);
                         var result = myWebClient.DownloadString(url);
                         var rootCustomer = JsonConvert.DeserializeObject<CustomerListRoot>(result);
                         if (rootCustomer != null)
@@ -196,7 +195,7 @@ namespace RepairShoprCore
                         if ((int)((HttpWebResponse)ex.Response).StatusCode == 429)
                         {
                             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                            return ExportCustomer(myNameValueCollection);
+                            return ExportCustomer(myNameValueCollection, remoteHost);
                         }
 
                         using (Stream data = ex.Response.GetResponseStream())
@@ -215,14 +214,14 @@ namespace RepairShoprCore
             return null;
         }
 
-        public static ContactResponse ExportContact(NameValueCollection myNameValueCollection)
+        public static ContactResponse ExportContact(NameValueCollection myNameValueCollection, string remoteHost)
         {
             using (WebClient myWebClient = new WebClient())
             {
                 try
                 {
                     RepairShoprUtils.LogWriteLineinHTML("Sending new Contact Parameter to RepairShopr ", MessageSource.Contact, "", messageType.Information);
-                    string urls = string.Format("https://{0}.{1}/api/v1/contacts.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
+                    string urls = string.Format("https://{0}.{1}/api/v1/contacts.json?api_key={2}", LoginResponse.Subdomain.Trim(), remoteHost, LoginResponse.UserToken.Trim());
                     var responseArray = myWebClient.UploadValues(urls, "POST", myNameValueCollection);
                     string jsonResult = Encoding.ASCII.GetString(responseArray);
                     RepairShoprUtils.LogWriteLineinHTML(string.Format("Server Response for Contact : {0} ", jsonResult), MessageSource.Customer, "", messageType.Information);
@@ -245,7 +244,7 @@ namespace RepairShoprCore
                         if ((int)((HttpWebResponse)ex.Response).StatusCode == 429)
                         {
                             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                            return ExportContact(myNameValueCollection);
+                            return ExportContact(myNameValueCollection, remoteHost);
                         }
 
                         using (Stream data = ex.Response.GetResponseStream())
@@ -264,14 +263,14 @@ namespace RepairShoprCore
             return null;
         }
 
-        public static Ticket ExportTicket(NameValueCollection myNameValueCollection)
+        public static Ticket ExportTicket(NameValueCollection myNameValueCollection, string remoteHost)
         {
             using (WebClient myWebClient = new WebClient())
             {
                 try
                 {
                     RepairShoprUtils.LogWriteLineinHTML("Sending new Ticket Parameter to RepairShopr ", MessageSource.Ticket, "", messageType.Information);
-                    string urls = string.Format("https://{0}.{1}/api/v1/tickets.json?api_key={2}", LoginResponse.Subdomain.Trim(), globalURl.Trim(), LoginResponse.UserToken.Trim());
+                    string urls = string.Format("https://{0}.{1}/api/v1/tickets.json?api_key={2}", LoginResponse.Subdomain.Trim(), remoteHost, LoginResponse.UserToken.Trim());
                     var responseArray = myWebClient.UploadValues(urls, "POST", myNameValueCollection);
                     string jsonResult = Encoding.ASCII.GetString(responseArray);
                     RepairShoprUtils.LogWriteLineinHTML(string.Format("Server Response for Ticket : {0} ", jsonResult), MessageSource.Ticket, "", messageType.Information);
@@ -286,7 +285,7 @@ namespace RepairShoprCore
                         if ((int)((HttpWebResponse)ex.Response).StatusCode == 429)
                         {
                             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                            return ExportTicket(myNameValueCollection);
+                            return ExportTicket(myNameValueCollection, remoteHost);
                         }
 
                         using (Stream data = ex.Response.GetResponseStream())

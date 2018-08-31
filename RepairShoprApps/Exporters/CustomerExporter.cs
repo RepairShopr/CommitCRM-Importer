@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ namespace RepairShoprApps
             _customerGroups = new List<IEnumerable<CommitCRM.Account>>();
         }
 
-        public async Task Export(DateTime fromDate)
+        public async Task Export(DateTime fromDate, string remoteHost)
         {
             DateTime startDate = fromDate;
             DateTime endDate = startDate.AddMonths(DATE_RANGE_TO_LOAD);
@@ -55,13 +56,14 @@ namespace RepairShoprApps
                     var loadCustomers = true;
                     while (loadCustomers)
                     {
+                        //divide in groups of 10
                         loadCustomers = await LoadCustomers(startDate, endDate);
                     }
 
                     var tasks = new List<Task>();
                     foreach (var group in _customerGroups)
                     {
-                        var task = ExportMultipleCustomers(group, connection);
+                        var task = ExportMultipleCustomers(group, connection, remoteHost);
                         tasks.Add(task);
 
                         if (tasks.Count == MAX_THREADS_COUNT)
@@ -72,9 +74,6 @@ namespace RepairShoprApps
                     }
 
                     await Task.WhenAll(tasks);
-
-                    Properties.Settings.Default.CustomerExport = startDate;
-                    Properties.Settings.Default.Save();
 
                     startDate = endDate;
                     endDate = startDate.AddMonths(DATE_RANGE_TO_LOAD);
@@ -116,8 +115,9 @@ namespace RepairShoprApps
             });
         }
 
-        private async Task ExportMultipleCustomers(IEnumerable<CommitCRM.Account> accounts, SQLiteConnection connection)
-        {
+        private async Task ExportMultipleCustomers(IEnumerable<CommitCRM.Account> accounts, SQLiteConnection connection, string remoteHost)
+        {   
+            Debug.WriteLine(accounts);
             foreach (CommitCRM.Account account in accounts)
             {
                 try
@@ -129,12 +129,16 @@ namespace RepairShoprApps
                     }
 
                     string customerId = string.Empty;
+                    //check cache and skip already exported
                     using (SQLiteCommand cmdItemAlready = new SQLiteCommand(string.Format("SELECT CustomerId FROM Account WHERE AccountId='{0}'", account.AccountREC_ID), connection))
                     {
                         using (SQLiteDataReader reader = cmdItemAlready.ExecuteReader())
                         {
                             while (reader.Read())
+                            {
+                                Debug.WriteLine(reader[0]);
                                 customerId = reader[0].ToString();
+                            }
                         }
                     }
 
@@ -148,7 +152,7 @@ namespace RepairShoprApps
                     ReportStatusEvent?.Invoke(message);
                     ReportProgressEvent?.Invoke(_index, (100 * _index) / _customerCount, false);
 
-                    var customer = await ExportSingleCustomer(account, connection);
+                    var customer = await ExportSingleCustomer(account, connection, remoteHost);
                     if (customer == null)
                     {
                         message = string.Format("Unable to create Account with Name : {0}", account.LastName);
